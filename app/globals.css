@@ -1,26 +1,170 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf7f0;
+  --foreground: #1f2a24;
+
+  --color-sand: #fbf7f0;
+  --color-sand-dark: #f0e7d6;
+  --color-ocean: #0e6e77;
+  --color-ocean-deep: #0a4f57;
+  --color-palm: #3e6b4f;
+  --color-palm-deep: #2a4a37;
+  --color-gold: #c99a2e;
+  --color-ink: #1f2a24;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-sand: var(--color-sand);
+  --color-sand-dark: var(--color-sand-dark);
+  --color-ocean: var(--color-ocean);
+  --color-ocean-deep: var(--color-ocean-deep);
+  --color-palm: var(--color-palm);
+  --color-palm-deep: var(--color-palm-deep);
+  --color-gold: var(--color-gold);
+  --color-ink: var(--color-ink);
+
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-fraunces);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-ocean);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Two layers crossfade, offset by exactly half the loop (see .hero-bg-layer-2).
+ * The fade-out ramp (40%→50%) and fade-in ramp (90%→100%) are the same width,
+ * so at every instant one layer's ramp mirrors the other's — combined opacity
+ * stays at ~1 the whole time instead of both layers dipping dark together.
+ * The zoom silently resets to scale(1) during the fully-transparent 50%→90%
+ * window, which is invisible since opacity is 0 across that whole span.
+ */
+@keyframes hero-kenburns {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1) translate3d(-1.4%, -0.9%, 0);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.13) translate3d(-1.7%, -1.1%, 0);
+  }
+  90% {
+    opacity: 0;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.hero-bg-layer {
+  animation: hero-kenburns 24s ease-in-out infinite;
+}
+
+.hero-bg-layer-2 {
+  animation-delay: -12s;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Marquee track renders the testimonial list twice back to back and scrolls
+ * exactly one set's width, so the loop point is invisible. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 45s linear infinite;
+}
+
+@keyframes cta-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.animate-cta-zoom {
+  animation: cta-zoom 20s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-layer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hero-bg-layer-2 {
+    opacity: 0 !important;
+  }
+  .animate-fade-in-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .animate-marquee {
+    animation: none !important;
+  }
+  .animate-cta-zoom {
+    animation: none !important;
+    transform: none !important;
+  }
+  .animate-bounce {
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
