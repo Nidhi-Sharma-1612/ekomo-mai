@@ -52,6 +52,15 @@ export default function CtaBand() {
             Contact Us
           </Link>
         </div>
+
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-sand/20 pt-6 text-xs font-semibold uppercase tracking-wider text-sand/70">
+          {trustSignals.map((item) => (
+            <span key={item.label} className="flex items-center gap-1.5">
+              <item.icon size={14} strokeWidth={2} className="text-gold" />
+              {item.label}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
