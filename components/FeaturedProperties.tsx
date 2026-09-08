@@ -28,22 +28,18 @@ export default async function FeaturedProperties() {
           </Link>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 lg:h-140">
-          {/*
-            The bento layout (featured card spanning 2x2, one wide card, two
-            square cards) only makes sense once lg:grid-cols-4 kicks in. Below
-            that, no col-span overrides are applied at all — every card falls
-            back to the plain 2-column tablet / 1-column mobile grid, so all
-            four render at a consistent, uniform size instead of two full-width
-            cards followed by two half-width ones.
-          */}
-          <div className="lg:col-span-2 lg:row-span-2">
+        {/*
+          Purpose-built for exactly 3 properties: one tall featured card on the
+          left, the other two stacked on the right. Grid auto-placement fills
+          both right-hand cells without needing per-card span overrides, so
+          there's no gap or uneven sizing at any breakpoint.
+        */}
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:grid-rows-2 sm:h-140">
+          <div className="sm:row-span-2">
             <PropertyCard property={featured} adaptive emphasis />
           </div>
-          {rest.map((property, i) => (
-            <div key={property.id} className={i === 0 ? "lg:col-span-2 lg:row-span-1" : "lg:col-span-1 lg:row-span-1"}>
-              <PropertyCard property={property} adaptive />
-            </div>
+          {rest.map((property) => (
+            <PropertyCard key={property.id} property={property} adaptive />
           ))}
         </div>
 

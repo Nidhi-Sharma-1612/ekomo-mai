@@ -1,6 +1,5 @@
 import "server-only";
 import type { Property } from "@/lib/types";
-import { staticProperties } from "@/lib/data/properties";
 import { HOSTAWAY_LISTINGS } from "@/lib/hostaway/listings";
 import { normalizeListing } from "@/lib/hostaway/normalize";
 import { fetchListing } from "@/lib/hostaway/client";
@@ -12,7 +11,8 @@ async function withLiveRate(property: Property): Promise<Property> {
   return averageRate ? { ...property, nightlyRateFrom: averageRate } : property;
 }
 
-async function fetchLiveProperties(): Promise<Property[]> {
+/** All properties shown on the site — the live Hostaway listings. */
+export async function getAllProperties(): Promise<Property[]> {
   const results = await Promise.allSettled(
     HOSTAWAY_LISTINGS.map(async (config) => {
       const raw = await fetchListing(config.id);
@@ -32,16 +32,7 @@ async function fetchLiveProperties(): Promise<Property[]> {
   return properties;
 }
 
-/** All properties shown on the site: live Hostaway listings + the static fallback(s). */
-export async function getAllProperties(): Promise<Property[]> {
-  const live = await fetchLiveProperties();
-  return [...live, ...staticProperties];
-}
-
 export async function getPropertyBySlug(slug: string): Promise<Property | undefined> {
-  const staticMatch = staticProperties.find((p) => p.slug === slug);
-  if (staticMatch) return staticMatch;
-
   const config = HOSTAWAY_LISTINGS.find((l) => l.slug === slug);
   if (!config) return undefined;
 
@@ -50,5 +41,5 @@ export async function getPropertyBySlug(slug: string): Promise<Property | undefi
 }
 
 export function getAllSlugs(): string[] {
-  return [...HOSTAWAY_LISTINGS.map((l) => l.slug), ...staticProperties.map((p) => p.slug)];
+  return HOSTAWAY_LISTINGS.map((l) => l.slug);
 }

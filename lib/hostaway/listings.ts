@@ -1,9 +1,7 @@
 /**
- * The Hostaway account we have credentials for manages 3 of the 4 listings
- * shown on the site. Slugs and short "resort" display names aren't reliably
- * derivable from the API response, so they're pinned here manually. The 4th
- * property (Lahaina Shores) isn't under this Hostaway account — it stays as
- * static content in lib/data/properties.ts until that's resolved.
+ * The 3 listings shown on the site. Slugs and short "resort" display names
+ * aren't reliably derivable from the API response, so they're pinned here
+ * manually.
  */
 export const HOSTAWAY_LISTINGS = [
   { id: 240142, slug: "oceanfront-studio-honeymoon", resort: "The Mahana" },

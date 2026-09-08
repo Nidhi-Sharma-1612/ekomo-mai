@@ -1,9 +1,8 @@
 /**
  * Fallback house-rule content used only when a property has no live
- * Hostaway house-rules text (currently: the static Lahaina Shores listing).
- * Live-sourced properties use their real check-in/out times, cancellation
- * tiers, and house rules from Hostaway instead — see
- * lib/hostaway/normalize.ts.
+ * Hostaway house-rules text. Live-sourced properties use their real
+ * check-in/out times, cancellation tiers, and house rules from Hostaway
+ * instead — see lib/hostaway/normalize.ts.
  */
 export const allowedRules = [
   "Self check-in with door code",
