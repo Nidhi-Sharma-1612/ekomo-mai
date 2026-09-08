@@ -34,6 +34,11 @@ export function isAfter(a: Date, b: Date): boolean {
   return startOfDay(a).getTime() > startOfDay(b).getTime();
 }
 
+/** Whole nights between two dates (b after a) — ignores time-of-day. */
+export function nightsBetween(a: Date, b: Date): number {
+  return Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / 86_400_000);
+}
+
 /** Builds a 6-week grid for the given month, padded with adjacent-month days. */
 export function buildMonthGrid(year: number, month: number): CalendarDay[][] {
   const firstOfMonth = new Date(year, month, 1);
@@ -73,4 +78,17 @@ export function toISODate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Parses a yyyy-mm-dd string as a LOCAL date (not UTC midnight — `new
+ * Date("2026-09-21")` parses as UTC, which shifts a day earlier in
+ * negative-offset timezones like Hawaii/US). Returns null if malformed.
+ */
+export function parseISODate(iso: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) return null;
+  const [, year, month, day] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  return Number.isNaN(date.getTime()) ? null : date;
 }

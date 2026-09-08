@@ -1,4 +1,5 @@
-import { testimonials } from "@/lib/data/testimonials";
+import { testimonials as fallbackTestimonials } from "@/lib/data/testimonials";
+import { getFeaturedTestimonials } from "@/lib/hostaway/reviews";
 import SectionHeading from "@/components/SectionHeading";
 import { StarIcon } from "@/components/StoryIcons";
 import type { Testimonial } from "@/lib/types";
@@ -15,6 +16,8 @@ function initials(name: string) {
 }
 
 function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; index: number }) {
+  const rating = testimonial.rating ?? 5;
+
   return (
     <figure className="relative flex h-80 w-72 shrink-0 flex-col justify-between overflow-hidden rounded-3xl bg-white p-6 shadow-sm ring-1 ring-ink/5 sm:w-95 sm:p-8">
       <svg
@@ -29,7 +32,7 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
       <div className="relative z-10">
         <div className="flex gap-1 text-gold">
           {Array.from({ length: 5 }).map((_, starIdx) => (
-            <StarIcon key={starIdx} className="h-4 w-4" filled />
+            <StarIcon key={starIdx} className="h-4 w-4" filled={starIdx < rating} />
           ))}
         </div>
         <blockquote className="mt-4 line-clamp-5 font-serif text-lg italic leading-relaxed text-ink">
@@ -52,7 +55,9 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
   );
 }
 
-export default function Testimonials() {
+export default async function Testimonials() {
+  const liveTestimonials = await getFeaturedTestimonials();
+  const testimonials = liveTestimonials.length > 0 ? liveTestimonials : fallbackTestimonials;
   const track = [...testimonials, ...testimonials];
 
   return (

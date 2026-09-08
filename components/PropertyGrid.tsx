@@ -5,10 +5,13 @@ import Reveal from "@/components/Reveal";
 export default function PropertyGrid({
   properties,
   columns = 3,
+  searchQuery,
 }: {
   properties: Property[];
   /** Number of columns at desktop width — pick whatever divides the list evenly. */
   columns?: 2 | 3;
+  /** Query string (e.g. "?checkIn=...&checkOut=...&guests=...") carried into each property's detail-page link. */
+  searchQuery?: string;
 }) {
   return (
     <div
@@ -16,7 +19,7 @@ export default function PropertyGrid({
     >
       {properties.map((property, i) => (
         <Reveal key={property.id} delay={i * 100}>
-          <PropertyCard property={property} />
+          <PropertyCard property={property} searchQuery={searchQuery} />
         </Reveal>
       ))}
     </div>

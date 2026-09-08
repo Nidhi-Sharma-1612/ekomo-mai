@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import DateRangeCalendar from "@/components/DateRangeCalendar";
-import { formatDisplayDate, isAfter, toISODate } from "@/lib/date";
+import { addDays, formatDisplayDate, isAfter, nightsBetween, toISODate } from "@/lib/date";
 
 function CalendarIcon() {
   return (
@@ -33,8 +33,33 @@ export default function BookingWidget() {
   const [checkOut, setCheckOut] = useState<Date | null>(null);
   const [guests, setGuests] = useState(2);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [unavailableDates, setUnavailableDates] = useState<Set<string>>(new Set());
+  const [minStayByDate, setMinStayByDate] = useState<Record<string, number>>({});
 
   const widgetRef = useRef<HTMLFormElement>(null);
+
+  // A date is only unavailable here if every property is booked that night —
+  // this widget searches across all homes, not one specific listing. Minimum
+  // stay is the lowest requirement among properties still available that
+  // night, so the search doesn't block a combination at least one home allows.
+  useEffect(() => {
+    const controller = new AbortController();
+    const today = new Date();
+    const startDate = toISODate(today);
+    const endDate = toISODate(addDays(today, 365));
+
+    fetch(`/api/hostaway/availability?startDate=${startDate}&endDate=${endDate}`, {
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((days: { date: string; isAvailable: boolean; minimumStay: number }[]) => {
+        setUnavailableDates(new Set(days.filter((d) => !d.isAvailable).map((d) => d.date)));
+        setMinStayByDate(Object.fromEntries(days.map((d) => [d.date, d.minimumStay])));
+      })
+      .catch(() => {});
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -56,6 +81,8 @@ export default function BookingWidget() {
     }
 
     if (isAfter(date, checkIn)) {
+      const minNights = minStayByDate[toISODate(checkIn)] ?? 1;
+      if (nightsBetween(checkIn, date) < minNights) return; // calendar already disables these; guard anyway
       setCheckOut(date);
       setCalendarOpen(false);
     } else {
@@ -179,6 +206,8 @@ export default function BookingWidget() {
             checkOut={checkOut}
             onSelect={handleSelectDate}
             onClear={handleClearDates}
+            unavailableDates={unavailableDates}
+            minStayByDate={minStayByDate}
           />
         </div>
       )}

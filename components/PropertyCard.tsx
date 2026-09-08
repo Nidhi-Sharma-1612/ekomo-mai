@@ -8,14 +8,18 @@ export default function PropertyCard({
   property,
   adaptive = false,
   emphasis = false,
+  searchQuery,
 }: {
   property: Property;
   /** Full-bleed image with an overlay caption, sized to fill a parent grid cell — for the bento-style "Our Homes" layout. */
   adaptive?: boolean;
   /** Slightly larger type treatment for a featured/hero card. */
   emphasis?: boolean;
+  /** Query string (e.g. "?checkIn=...&checkOut=...&guests=...") carried into the detail-page link. */
+  searchQuery?: string;
 }) {
   const cover = property.images[0];
+  const href = `/properties/${property.slug}${searchQuery ?? ""}`;
 
   if (adaptive) {
     return (
@@ -71,7 +75,7 @@ export default function PropertyCard({
 
   return (
     <Link
-      href={`/properties/${property.slug}`}
+      href={href}
       className="group block overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-ink/5 transition-shadow hover:shadow-xl"
     >
       <div className="relative aspect-4/3 overflow-hidden">

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { properties } from "@/lib/data/properties";
+import { getAllProperties } from "@/lib/hostaway/getProperties";
 import PropertyCard from "@/components/PropertyCard";
 import SectionHeading from "@/components/SectionHeading";
 
-export default function FeaturedProperties() {
+export default async function FeaturedProperties() {
+  const properties = await getAllProperties();
   const [featured, ...rest] = properties;
+
+  if (!featured) return null;
 
   return (
     <section className="py-24">
@@ -26,14 +29,19 @@ export default function FeaturedProperties() {
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 lg:h-140">
-          <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">
+          {/*
+            The bento layout (featured card spanning 2x2, one wide card, two
+            square cards) only makes sense once lg:grid-cols-4 kicks in. Below
+            that, no col-span overrides are applied at all — every card falls
+            back to the plain 2-column tablet / 1-column mobile grid, so all
+            four render at a consistent, uniform size instead of two full-width
+            cards followed by two half-width ones.
+          */}
+          <div className="lg:col-span-2 lg:row-span-2">
             <PropertyCard property={featured} adaptive emphasis />
           </div>
           {rest.map((property, i) => (
-            <div
-              key={property.id}
-              className={i === 0 ? "sm:col-span-2 lg:col-span-2 lg:row-span-1" : "lg:col-span-1 lg:row-span-1"}
-            >
+            <div key={property.id} className={i === 0 ? "lg:col-span-2 lg:row-span-1" : "lg:col-span-1 lg:row-span-1"}>
               <PropertyCard property={property} adaptive />
             </div>
           ))}

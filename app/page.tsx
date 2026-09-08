@@ -7,6 +7,10 @@ import Testimonials from "@/components/Testimonials";
 import CtaBand from "@/components/CtaBand";
 import Reveal from "@/components/Reveal";
 
+// Revalidate periodically so the featured properties stay in sync with
+// Hostaway (price, description, photos) without needing a full redeploy.
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <>

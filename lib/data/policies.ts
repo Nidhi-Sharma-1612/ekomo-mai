@@ -1,13 +1,10 @@
 /**
- * Standard house rules & cancellation policy — not yet confirmed by the
- * client. These reflect typical terms for a resort-condo short-term rental
- * (self check-in, no parties/pets/smoking, moderate cancellation window).
- * Replace with Louis & Kristine's actual policy, or pull it live from
- * Hostaway, before launch.
+ * Fallback house-rule content used only when a property has no live
+ * Hostaway house-rules text (currently: the static Lahaina Shores listing).
+ * Live-sourced properties use their real check-in/out times, cancellation
+ * tiers, and house rules from Hostaway instead — see
+ * lib/hostaway/normalize.ts.
  */
-export const checkInTime = "4:00 PM";
-export const checkOutTime = "10:00 AM";
-
 export const allowedRules = [
   "Self check-in with door code",
   "Long-term stays allowed",
@@ -19,10 +16,4 @@ export const notAllowedRules = [
   "No parties or events",
   "No pets",
   "Quiet hours 10 PM – 8 AM",
-];
-
-export const cancellationTiers = [
-  { window: "14+ days before check-in", refund: "Full refund" },
-  { window: "7–13 days before check-in", refund: "50% refund" },
-  { window: "Within 7 days of check-in", refund: "No refund" },
 ];

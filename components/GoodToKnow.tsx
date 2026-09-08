@@ -1,11 +1,6 @@
-import {
-  allowedRules,
-  cancellationTiers,
-  checkInTime,
-  checkOutTime,
-  notAllowedRules,
-} from "@/lib/data/policies";
+import { allowedRules, notAllowedRules } from "@/lib/data/policies";
 import { CheckIcon, ClockIcon, CrossIcon, PolicyIcon } from "@/components/PropertyIcons";
+import type { Property } from "@/lib/types";
 
 const tierAccents: Record<string, string> = {
   "Full refund": "bg-palm",
@@ -13,7 +8,19 @@ const tierAccents: Record<string, string> = {
   "No refund": "bg-ink/30",
 };
 
-export default function GoodToKnow() {
+/** Hostaway's houseRules field is free text (e.g. "No smoking in condo or on lanai.") — split into list items. */
+function splitRestrictions(text: string): string[] {
+  return text
+    .split(/[.\n]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export default function GoodToKnow({ property }: { property: Property }) {
+  const restrictions = property.houseRulesText
+    ? splitRestrictions(property.houseRulesText)
+    : notAllowedRules;
+
   return (
     <div className="mt-10">
       <h2 className="font-serif text-2xl text-ink">Good to Know</h2>
@@ -32,13 +39,13 @@ export default function GoodToKnow() {
               <p className="text-[10px] font-semibold uppercase tracking-wider text-ink/45">
                 Check-in
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-ink">After {checkInTime}</p>
+              <p className="mt-0.5 text-sm font-semibold text-ink">After {property.checkInTime}</p>
             </div>
             <div className="rounded-2xl bg-sand-dark/40 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-ink/45">
                 Check-out
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-ink">By {checkOutTime}</p>
+              <p className="mt-0.5 text-sm font-semibold text-ink">By {property.checkOutTime}</p>
             </div>
           </div>
 
@@ -56,7 +63,7 @@ export default function GoodToKnow() {
           <div className="my-4 border-t border-ink/10" />
 
           <div className="space-y-2.5">
-            {notAllowedRules.map((rule) => (
+            {restrictions.map((rule) => (
               <div key={rule} className="flex items-center gap-3 text-sm text-ink/60">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink/40">
                   <CrossIcon />
@@ -76,7 +83,7 @@ export default function GoodToKnow() {
           </div>
 
           <ul className="mt-5 space-y-3">
-            {cancellationTiers.map((tier) => (
+            {property.cancellationTiers.map((tier) => (
               <li
                 key={tier.window}
                 className="flex items-center gap-3 rounded-2xl bg-sand-dark/40 px-4 py-3.5 text-sm"
@@ -91,7 +98,9 @@ export default function GoodToKnow() {
             ))}
           </ul>
           <p className="mt-4 text-xs text-ink/50">
-            Standard policy shown — final terms confirmed at booking.
+            {property.source === "hostaway"
+              ? `Based on this property's "${property.cancellationPolicyName}" policy — confirmed at booking.`
+              : "Standard policy shown — final terms confirmed at booking."}
           </p>
         </div>
       </div>

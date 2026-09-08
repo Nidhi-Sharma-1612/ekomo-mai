@@ -9,7 +9,9 @@ import {
   isAfter,
   isBefore,
   isSameDay,
+  nightsBetween,
   startOfDay,
+  toISODate,
   type CalendarDay,
 } from "@/lib/date";
 
@@ -21,6 +23,9 @@ export default function DateRangeCalendar({
   onSelect,
   onClear,
   singleMonth = false,
+  unavailableDates,
+  priceByDate,
+  minStayByDate,
 }: {
   checkIn: Date | null;
   checkOut: Date | null;
@@ -28,6 +33,12 @@ export default function DateRangeCalendar({
   onClear: () => void;
   /** Force a single month even at widths that would normally show two — for narrow containers like a sidebar. */
   singleMonth?: boolean;
+  /** ISO (yyyy-mm-dd) dates that are booked/blocked — from live Hostaway availability. */
+  unavailableDates?: Set<string>;
+  /** ISO (yyyy-mm-dd) -> nightly price, shown under each day when provided. */
+  priceByDate?: Record<string, number>;
+  /** ISO (yyyy-mm-dd) -> minimum nights required if checking in that day. */
+  minStayByDate?: Record<string, number>;
 }) {
   const today = startOfDay(new Date());
   const [viewMonth, setViewMonth] = useState(() => addMonths(checkIn ?? today, 0));
@@ -68,6 +79,9 @@ export default function DateRangeCalendar({
                   rangeEnd={rangeEnd}
                   onSelect={onSelect}
                   onHover={setHoverDate}
+                  unavailableDates={unavailableDates}
+                  priceByDate={priceByDate}
+                  minStayByDate={minStayByDate}
                 />
               ))}
             </div>
@@ -90,7 +104,9 @@ export default function DateRangeCalendar({
           <ChevronLeft size={16} strokeWidth={2} />
         </button>
         <span className="text-[11px] font-semibold uppercase tracking-wider text-ink/40">
-          Select check-in &amp; check-out
+          {checkIn && !checkOut && (minStayByDate?.[toISODate(checkIn)] ?? 1) > 1
+            ? `${minStayByDate?.[toISODate(checkIn)]}-night minimum`
+            : "Select check-in & check-out"}
         </span>
         <button
           type="button"
@@ -122,6 +138,11 @@ export default function DateRangeCalendar({
           <span className="flex items-center gap-1">
             <span className="h-2.5 w-2.5 rounded-full bg-ocean/20" /> In range
           </span>
+          {unavailableDates && (
+            <span className="flex items-center gap-1">
+              <span className="text-ink/40 line-through">12</span> Unavailable
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -136,6 +157,9 @@ function DayCell({
   rangeEnd,
   onSelect,
   onHover,
+  unavailableDates,
+  priceByDate,
+  minStayByDate,
 }: {
   day: CalendarDay;
   today: Date;
@@ -144,10 +168,23 @@ function DayCell({
   rangeEnd: Date | null;
   onSelect: (date: Date) => void;
   onHover: (date: Date | null) => void;
+  unavailableDates?: Set<string>;
+  priceByDate?: Record<string, number>;
+  minStayByDate?: Record<string, number>;
 }) {
   const { date, isCurrentMonth } = day;
+  const iso = toISODate(date);
   const isPast = isBefore(date, today);
-  const disabled = isPast || !isCurrentMonth;
+  const isBooked = unavailableDates?.has(iso) ?? false;
+
+  // While picking a check-out date, disable candidates that don't satisfy
+  // the check-in date's minimum-stay requirement.
+  const minNights = checkIn ? (minStayByDate?.[toISODate(checkIn)] ?? 1) : 1;
+  const isTooSoon =
+    !!checkIn && !checkOut && isAfter(date, checkIn) && nightsBetween(checkIn, date) < minNights;
+
+  const disabled = isPast || !isCurrentMonth || isBooked || isTooSoon;
+  const price = priceByDate?.[iso];
 
   const isStart = isSameDay(date, checkIn);
   const isEnd = isSameDay(date, checkOut) || (!checkOut && isSameDay(date, rangeEnd) && !isStart);
@@ -162,8 +199,10 @@ function DayCell({
   const showBarRight = (inRange || isStart) && !isEnd;
   const showBar = isCurrentMonth && !!checkIn && !!rangeEnd && (inRange || isStart || isEnd);
 
+  const showPrice = Boolean(priceByDate) && isCurrentMonth && !isPast;
+
   return (
-    <div className="relative flex h-8 w-full items-center justify-center">
+    <div className={`relative flex w-full flex-col items-center justify-center ${showPrice ? "h-11" : "h-8"}`}>
       {showBar && (
         <div
           aria-hidden="true"
@@ -180,10 +219,17 @@ function DayCell({
         disabled={disabled}
         onClick={() => onSelect(date)}
         onMouseEnter={() => onHover(date)}
+        title={
+          isBooked
+            ? "Not available"
+            : isTooSoon
+              ? `${minNights}-night minimum stay`
+              : undefined
+        }
         className={[
           "relative z-10 flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium transition-colors",
           disabled
-            ? "cursor-not-allowed text-ink/20"
+            ? `cursor-not-allowed ${isBooked ? "text-ink/25 line-through" : "text-ink/20"}`
             : isStart || isEnd
               ? "bg-ocean-deep text-white shadow-sm"
               : "text-ink hover:bg-sand-dark",
@@ -191,6 +237,12 @@ function DayCell({
       >
         {date.getDate()}
       </button>
+
+      {showPrice && (
+        <span className="relative z-10 text-[9px] leading-none text-ink/40">
+          {price ? `$${price}` : ""}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import type { Testimonial } from "@/lib/types";
 
 /**
- * Illustrative demo reviews — the current site has none published yet.
- * Fictional names/locations for mockup purposes only. Swap for real guest
- * reviews (Airbnb/VRBO export or Hostaway) before launch.
+ * Fallback testimonials shown only if live Hostaway reviews fail to load
+ * (see lib/hostaway/reviews.ts) — real guest reviews are the primary source.
+ * Fictional names/locations, for that fallback case only.
  */
 export const testimonials: Testimonial[] = [
   {

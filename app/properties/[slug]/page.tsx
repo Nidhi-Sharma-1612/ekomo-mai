@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { properties, getPropertyBySlug } from "@/lib/data/properties";
+import { getAllProperties, getAllSlugs, getPropertyBySlug } from "@/lib/hostaway/getProperties";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyGrid from "@/components/PropertyGrid";
 import PropertyBookingCard from "@/components/PropertyBookingCard";
@@ -9,19 +9,25 @@ import MapEmbed from "@/components/MapEmbed";
 import GoodToKnow from "@/components/GoodToKnow";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
+import { parseDescriptionBlocks } from "@/lib/formatDescription";
+import AmenitiesList from "@/components/AmenitiesList";
 import { ArrowLeft } from "lucide-react";
-import { BathIcon, BedIcon, CheckIcon, GuestsIcon } from "@/components/PropertyIcons";
+import { BathIcon, BedIcon, GuestsIcon } from "@/components/PropertyIcons";
 import { PinIcon } from "@/components/FooterIcons";
 
 export function generateStaticParams() {
-  return properties.map((property) => ({ slug: property.slug }));
+  return getAllSlugs().map((slug) => ({ slug }));
 }
+
+// Revalidate periodically so listing details, and the fallback price shown
+// before the live calendar loads, stay in sync with Hostaway.
+export const revalidate = 3600;
 
 export async function generateMetadata(
   props: PageProps<"/properties/[slug]">
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug);
 
   if (!property) return {};
 
@@ -35,11 +41,18 @@ export default async function PropertyDetailPage(
   props: PageProps<"/properties/[slug]">
 ) {
   const { slug } = await props.params;
-  const property = getPropertyBySlug(slug);
+  const searchParams = await props.searchParams;
+  const property = await getPropertyBySlug(slug);
 
   if (!property) notFound();
 
-  const otherProperties = properties.filter((p) => p.slug !== slug);
+  const initialCheckIn = typeof searchParams.checkIn === "string" ? searchParams.checkIn : undefined;
+  const initialCheckOut = typeof searchParams.checkOut === "string" ? searchParams.checkOut : undefined;
+  const initialGuests = typeof searchParams.guests === "string" ? Number(searchParams.guests) : undefined;
+
+  const allProperties = await getAllProperties();
+  const otherProperties = allProperties.filter((p) => p.slug !== slug);
+  const descriptionBlocks = parseDescriptionBlocks(property.longDescription);
 
   return (
     <>
@@ -96,13 +109,39 @@ export default async function PropertyDetailPage(
               </span>
             </div>
 
-            <div className="mt-8 space-y-4 text-base leading-relaxed text-ink/80">
-              <p>{property.longDescription}</p>
+            <div className="mt-8 space-y-5 text-base leading-relaxed text-ink/80">
+              {descriptionBlocks.map((block, i) => {
+                if (block.type === "heading") {
+                  return (
+                    <h3 key={i} className="pt-2 font-serif text-xl text-ink first:pt-0">
+                      {block.text}
+                    </h3>
+                  );
+                }
+                if (block.type === "list") {
+                  return (
+                    <ul key={i} className="space-y-2.5">
+                      {block.items.map((item, j) => (
+                        <li key={j} className="flex items-start gap-3">
+                          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                }
+                return <p key={i}>{block.text}</p>;
+              })}
             </div>
           </Reveal>
 
           <div className="order-2 lg:order-0 lg:col-start-3 lg:row-span-4 lg:row-start-1">
-            <PropertyBookingCard property={property} />
+            <PropertyBookingCard
+              property={property}
+              initialCheckIn={initialCheckIn}
+              initialCheckOut={initialCheckOut}
+              initialGuests={initialGuests}
+            />
           </div>
 
           <Reveal
@@ -110,16 +149,9 @@ export default async function PropertyDetailPage(
             className="order-3 lg:order-0 lg:col-span-2 lg:col-start-1 lg:row-start-2"
           >
             <h2 className="font-serif text-2xl text-ink">Amenities</h2>
-            <ul className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-              {property.amenities.map((amenity) => (
-                <li key={amenity} className="flex items-center gap-3 text-sm text-ink/75">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-palm/10 text-palm">
-                    <CheckIcon />
-                  </span>
-                  {amenity}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-6">
+              <AmenitiesList amenities={property.amenities} />
+            </div>
           </Reveal>
 
           <Reveal
@@ -144,7 +176,7 @@ export default async function PropertyDetailPage(
             delay={200}
             className="order-5 lg:order-0 lg:col-span-2 lg:col-start-1 lg:row-start-4"
           >
-            <GoodToKnow />
+            <GoodToKnow property={property} />
           </Reveal>
         </div>
       </section>
