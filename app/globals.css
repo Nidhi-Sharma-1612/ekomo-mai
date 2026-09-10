@@ -56,43 +56,10 @@ select:focus-visible,
   display: none;
 }
 
-/*
- * Two layers crossfade, offset by exactly half the loop (see .hero-bg-layer-2).
- * The fade-out ramp (40%→50%) and fade-in ramp (90%→100%) are the same width,
- * so at every instant one layer's ramp mirrors the other's — combined opacity
- * stays at ~1 the whole time instead of both layers dipping dark together.
- * The zoom silently resets to scale(1) during the fully-transparent 50%→90%
- * window, which is invisible since opacity is 0 across that whole span.
- */
-@keyframes hero-kenburns {
-  0% {
-    opacity: 1;
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.1) translate3d(-1.4%, -0.9%, 0);
-  }
-  50% {
-    opacity: 0;
-    transform: scale(1.13) translate3d(-1.7%, -1.1%, 0);
-  }
-  90% {
-    opacity: 0;
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-}
-
-.hero-bg-layer {
-  animation: hero-kenburns 24s ease-in-out infinite;
-}
-
-.hero-bg-layer-2 {
-  animation-delay: -12s;
+/* Static poster image hidden behind the hero video — shown only as a loading/error
+ * fallback and for prefers-reduced-motion (see below). */
+.hero-video-fallback {
+  opacity: 0;
 }
 
 @keyframes fade-in-up {
@@ -139,13 +106,11 @@ select:focus-visible,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg-layer {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+  .hero-video {
+    display: none !important;
   }
-  .hero-bg-layer-2 {
-    opacity: 0 !important;
+  .hero-video-fallback {
+    opacity: 1 !important;
   }
   .animate-fade-in-up {
     animation: none !important;
