@@ -53,8 +53,8 @@ export default function NavbarClient({
               src={logoUrl}
               alt={brandName}
               className={[
-                "h-12 w-auto transition-all duration-300",
-                overHero ? "drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]" : "",
+                "h-12 w-auto rounded-full transition-all duration-300",
+                overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : "",
               ].join(" ")}
             />
           ) : (
@@ -62,8 +62,8 @@ export default function NavbarClient({
               src={logo}
               alt={brandName}
               className={[
-                "h-12 w-auto transition-all duration-300",
-                overHero ? "brightness-0 invert drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]" : "",
+                "h-12 w-auto rounded-full transition-all duration-300",
+                overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : "",
               ].join(" ")}
               priority
             />
