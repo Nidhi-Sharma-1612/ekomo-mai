@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import founders from "@/public/images/about/founders.jpeg";
 import { HeartIcon, PalmIcon, StarIcon } from "@/components/StoryIcons";
+import { getPageSections, str } from "@/lib/cms";
 
 const facts = [
   { icon: PalmIcon, label: "30 years exploring Maui", accent: "bg-palm/10 text-palm" },
@@ -10,7 +11,24 @@ const facts = [
   { icon: StarIcon, label: "Superhost & Premier Host rated", accent: "bg-ocean/10 text-ocean" },
 ];
 
-export default function StoryTeaser() {
+export default async function StoryTeaser() {
+  const sections = await getPageSections("home");
+  const about = sections.about ?? {};
+
+  const eyebrow = str(about, "eyebrow", "Our Story");
+  const heading = str(about, "heading", "Aloha, from Louis & Kristine");
+  const paragraph1 = str(
+    about,
+    "paragraph1",
+    "We've been captivated by the enchanting beauty of the Hawaiian Islands since 1995. Maui holds something truly special — pristine beaches, the Road to Hana, sunrise over Haleakala, and a pace of life that never feels crowded, no matter the season.",
+  );
+  const paragraph2 = str(
+    about,
+    "paragraph2",
+    "We built LahainaOceanfrontRentals to share that feeling with every guest who stays with us — real Aloha spirit, from booking to check-out.",
+  );
+  const linkLabel = str(about, "linkLabel", "Read our full story");
+
   return (
     <section className="relative overflow-hidden py-24">
       <div
@@ -31,7 +49,7 @@ export default function StoryTeaser() {
           <div className="relative aspect-4/5 overflow-hidden rounded-tl-[5rem] rounded-tr-2xl rounded-br-[5rem] rounded-bl-2xl shadow-xl shadow-ocean-deep/10 sm:aspect-4/3">
             <Image
               src={founders}
-              alt="Louis and Kristine Trinh, founders of E Komo Mai Vacation Rentals, on a boat off the coast of Maui"
+              alt="Louis and Kristine Trinh, founders of LahainaOceanfrontRentals, on a boat off the coast of Maui"
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
@@ -47,20 +65,10 @@ export default function StoryTeaser() {
         </div>
 
         <div>
-          <p className="font-serif text-lg italic text-gold">Our Story</p>
-          <h2 className="mt-2 font-serif text-3xl text-ink sm:text-4xl">
-            Aloha, from Louis &amp; Kristine
-          </h2>
-          <p className="mt-6 text-base leading-relaxed text-ink/70">
-            We&rsquo;ve been captivated by the enchanting beauty of the Hawaiian
-            Islands since 1995. Maui holds something truly special &mdash; pristine
-            beaches, the Road to Hana, sunrise over Haleakala, and a pace of
-            life that never feels crowded, no matter the season.
-          </p>
-          <p className="mt-4 text-base leading-relaxed text-ink/70">
-            We built E Komo Mai to share that feeling with every guest who
-            stays with us &mdash; real Aloha spirit, from booking to check-out.
-          </p>
+          <p className="font-serif text-lg italic text-gold">{eyebrow}</p>
+          <h2 className="mt-2 font-serif text-3xl text-ink sm:text-4xl">{heading}</h2>
+          <p className="mt-6 text-base leading-relaxed text-ink/70">{paragraph1}</p>
+          <p className="mt-4 text-base leading-relaxed text-ink/70">{paragraph2}</p>
 
           <div className="mt-8 flex flex-wrap gap-3">
             {facts.map((fact) => (
@@ -84,7 +92,7 @@ export default function StoryTeaser() {
             href="/about"
             className="group mt-8 inline-flex items-center justify-center gap-2 rounded-full border border-ocean px-7 py-3 text-sm font-semibold text-ocean transition-colors hover:bg-ocean hover:text-white"
           >
-            Read our full story
+            {linkLabel}
             <ArrowRight size={16} strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>

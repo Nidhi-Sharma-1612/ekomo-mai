@@ -8,6 +8,7 @@ import {
   TagIcon,
   WrenchIcon,
 } from "@/components/ServiceIcons";
+import { getPageSections, str } from "@/lib/cms";
 
 const icons = {
   "check-in": KeyIcon,
@@ -24,14 +25,21 @@ const accents = [
   { badge: "bg-gold/15 text-gold", ring: "hover:ring-gold/40" },
 ];
 
-export default function ServiceHighlights() {
+export default async function ServiceHighlights() {
+  const sections = await getPageSections("home");
+  const services = sections.services ?? {};
+
   return (
     <section className="bg-sand-dark/40 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading
-          eyebrow="What We Offer"
-          title="Hospitality that feels like Aloha"
-          description="Every stay is backed by the same standards we'd want for our own family — because for us, this island is personal."
+          eyebrow={str(services, "eyebrow", "What We Offer")}
+          title={str(services, "heading", "Hospitality that feels like Aloha")}
+          description={str(
+            services,
+            "description",
+            "Every stay is backed by the same standards we'd want for our own family — because for us, this island is personal.",
+          )}
           align="center"
         />
 

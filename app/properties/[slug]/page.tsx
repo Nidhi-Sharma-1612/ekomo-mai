@@ -32,7 +32,7 @@ export async function generateMetadata(
   if (!property) return {};
 
   return {
-    title: `${property.name} | E Komo Mai Vacation Rentals`,
+    title: `${property.name} | LahainaOceanfrontRentals`,
     description: property.description,
   };
 }

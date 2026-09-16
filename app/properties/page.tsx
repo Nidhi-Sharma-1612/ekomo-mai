@@ -6,9 +6,10 @@ import { getAllProperties } from "@/lib/hostaway/getProperties";
 import { isRangeAvailable } from "@/lib/hostaway/availability";
 import { formatDisplayDate, parseISODate } from "@/lib/date";
 import heroImage from "@/public/images/stock/beach-palms-sailboat.jpg";
+import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
-  title: "Properties | E Komo Mai Vacation Rentals",
+  title: "Properties | LahainaOceanfrontRentals",
   description:
     "Browse our oceanfront condos across Lahaina and Kaanapali, Maui — hand-managed by Louis & Kristine Trinh.",
 };
@@ -20,7 +21,19 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
   const guests = typeof searchParams.guests === "string" ? Number(searchParams.guests) : undefined;
   const hasSearch = Boolean(checkIn && checkOut);
 
-  const allProperties = await getAllProperties();
+  const [allProperties, sections] = await Promise.all([
+    getAllProperties(),
+    getPageSections("properties"),
+  ]);
+  const intro = sections.intro ?? {};
+  const eyebrow = str(intro, "eyebrow", "Our Homes");
+  const heroTitle = str(intro, "heading", "Every property, hand-managed");
+  const heroDescription = str(
+    intro,
+    "description",
+    "From honeymoon studios to resort-style condos with room for the family — each one hosted with real Aloha spirit.",
+  );
+  const regionText = str(intro, "regionText", "Oceanfront condos in Lahaina & Kaanapali, West Maui");
 
   let properties = allProperties;
   if (guests) {
@@ -51,12 +64,7 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
 
   return (
     <>
-      <PageHero
-        eyebrow="Our Homes"
-        title="Every property, hand-managed"
-        description="From honeymoon studios to resort-style condos with room for the family — each one hosted with real Aloha spirit."
-        image={heroImage}
-      />
+      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={heroImage} />
 
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
@@ -76,7 +84,7 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
                     {guests ? `, ${guests} guest${guests > 1 ? "s" : ""}` : ""}
                   </>
                 ) : (
-                  "Oceanfront condos in Lahaina & Kaanapali, West Maui"
+                  regionText
                 )}
               </p>
             </div>

@@ -3,27 +3,35 @@ import { ArrowRight } from "lucide-react";
 import { getAllProperties } from "@/lib/hostaway/getProperties";
 import PropertyCard from "@/components/PropertyCard";
 import SectionHeading from "@/components/SectionHeading";
+import { getPageSections, str } from "@/lib/cms";
 
 export default async function FeaturedProperties() {
-  const properties = await getAllProperties();
+  const [properties, sections] = await Promise.all([getAllProperties(), getPageSections("home")]);
+  const featuredProperties = sections.featuredProperties ?? {};
   const [featured, ...rest] = properties;
 
   if (!featured) return null;
+
+  const linkLabel = str(featuredProperties, "linkLabel", "View all properties");
 
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Our Homes"
-            title="Oceanfront condos across West Maui"
-            description="Every unit is hand-managed by us, not a faceless property manager — hosted, cleaned, and checked in with real Aloha spirit."
+            eyebrow={str(featuredProperties, "eyebrow", "Our Homes")}
+            title={str(featuredProperties, "heading", "Oceanfront condos across West Maui")}
+            description={str(
+              featuredProperties,
+              "description",
+              "Every unit is hand-managed by us, not a faceless property manager — hosted, cleaned, and checked in with real Aloha spirit.",
+            )}
           />
           <Link
             href="/properties"
             className="group hidden shrink-0 items-center gap-2 text-sm font-semibold text-ocean transition-colors hover:text-ocean-deep sm:inline-flex"
           >
-            View all properties
+            {linkLabel}
             <ArrowRight size={16} strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
@@ -45,7 +53,7 @@ export default async function FeaturedProperties() {
 
         <div className="mt-10 sm:hidden">
           <Link href="/properties" className="inline-flex items-center gap-2 text-sm font-semibold text-ocean">
-            View all properties
+            {linkLabel}
             <ArrowRight size={16} strokeWidth={2} />
           </Link>
         </div>

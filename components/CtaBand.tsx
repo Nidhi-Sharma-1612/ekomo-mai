@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Home, Tag } from "lucide-react";
 import bg from "@/public/images/stock/beach-birds-sunrise.jpg";
+import { getPageSections, str } from "@/lib/cms";
 
 const trustSignals = [
   { icon: BadgeCheck, label: "Superhost Rated" },
@@ -9,7 +10,18 @@ const trustSignals = [
   { icon: Home, label: "Hosted by Real Locals" },
 ];
 
-export default function CtaBand() {
+export default async function CtaBand() {
+  const sections = await getPageSections("home");
+  const cta = sections.cta ?? {};
+
+  const eyebrow = str(cta, "eyebrow", "Start Planning");
+  const heading = str(cta, "heading", "Ready to feel the Aloha spirit?");
+  const description = str(
+    cta,
+    "description",
+    "Reach out and we'll help you find the right oceanfront condo for your Maui getaway.",
+  );
+
   return (
     <section className="relative isolate overflow-hidden py-28">
       <Image
@@ -24,15 +36,12 @@ export default function CtaBand() {
 
       <div className="relative mx-auto max-w-3xl px-6 text-center text-sand">
         <p className="font-serif text-lg italic text-gold drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-          Start Planning
+          {eyebrow}
         </p>
         <h2 className="mt-2 font-serif text-3xl drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] sm:text-4xl">
-          Ready to feel the Aloha spirit?
+          {heading}
         </h2>
-        <p className="mt-4 text-base text-sand/85">
-          Reach out and we&rsquo;ll help you find the right oceanfront condo for
-          your Maui getaway.
-        </p>
+        <p className="mt-4 text-base text-sand/85">{description}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
             href="/properties"

@@ -5,22 +5,46 @@ import MapEmbed from "@/components/MapEmbed";
 import Reveal from "@/components/Reveal";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "@/components/FooterIcons";
 import heroImage from "@/public/images/stock/poolside-dusk.jpg";
+import { getPageSections, getSiteSettings, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
-  title: "Contact Us | E Komo Mai Vacation Rentals",
+  title: "Contact Us | LahainaOceanfrontRentals",
   description:
     "Get in touch with Louis & Kristine Trinh to plan your Maui stay, check availability, or ask a question about a property.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [sections, settings] = await Promise.all([getPageSections("contact"), getSiteSettings()]);
+  const intro = sections.intro ?? {};
+
+  const eyebrow = str(intro, "eyebrow", "Get in Touch");
+  const heroTitle = str(intro, "heading", "Let's plan your Maui stay");
+  const heroDescription = str(
+    intro,
+    "description",
+    "Questions about a property, dates, or the island itself? We usually respond within the hour.",
+  );
+  const formHeading = str(intro, "formHeading", "Send us a message");
+  const formSubtext = str(
+    intro,
+    "formSubtext",
+    "Fill out the form below and we'll get back to you shortly.",
+  );
+  const trustNote = str(
+    intro,
+    "trustNote",
+    "Held to Airbnb Superhost and VRBO Premier Host standards — expect a reply within the hour during normal waking hours in Hawaii.",
+  );
+
+  const email = settings?.email ?? "pahiatrinh@gmail.com";
+  const phone = settings?.phone ?? "+1 (770) 714-5258";
+  const phoneDigits = phone.replace(/[^\d+]/g, "");
+  const facebookUrl = settings?.socialLinks?.facebook ?? "https://www.facebook.com/E.Komo.Mai.Maui";
+  const instagramUrl = settings?.socialLinks?.instagram ?? "https://www.instagram.com/westmauirentals/";
+
   return (
     <>
-      <PageHero
-        eyebrow="Get in Touch"
-        title="Let's plan your Maui stay"
-        description="Questions about a property, dates, or the island itself? We usually respond within the hour."
-        image={heroImage}
-      />
+      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={heroImage} />
 
       <section className="relative overflow-hidden py-20">
         <div
@@ -34,10 +58,8 @@ export default function ContactPage() {
 
         <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-3">
           <Reveal className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-ink/5 lg:col-span-2 sm:p-10">
-            <h2 className="font-serif text-2xl text-ink">Send us a message</h2>
-            <p className="mt-2 text-sm text-ink/60">
-              Fill out the form below and we&rsquo;ll get back to you shortly.
-            </p>
+            <h2 className="font-serif text-2xl text-ink">{formHeading}</h2>
+            <p className="mt-2 text-sm text-ink/60">{formSubtext}</p>
             <div className="mt-8">
               <ContactForm />
             </div>
@@ -48,22 +70,22 @@ export default function ContactPage() {
               <h3 className="font-serif text-lg text-ink">Direct Contact</h3>
               <div className="mt-4 space-y-3 text-sm">
                 <a
-                  href="mailto:pahiatrinh@gmail.com"
+                  href={`mailto:${email}`}
                   className="flex items-center gap-3 font-semibold text-ocean transition-colors hover:text-ocean-deep"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ocean/10 text-ocean">
                     <MailIcon />
                   </span>
-                  pahiatrinh@gmail.com
+                  {email}
                 </a>
                 <a
-                  href="tel:+17707145258"
+                  href={`tel:${phoneDigits}`}
                   className="flex items-center gap-3 font-semibold text-ocean transition-colors hover:text-ocean-deep"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ocean/10 text-ocean">
                     <PhoneIcon />
                   </span>
-                  +1 (770) 714-5258
+                  {phone}
                 </a>
               </div>
             </Reveal>
@@ -72,7 +94,7 @@ export default function ContactPage() {
               <h3 className="font-serif text-lg text-ink">Follow Along</h3>
               <div className="mt-4 flex gap-3">
                 <a
-                  href="https://www.facebook.com/E.Komo.Mai.Maui"
+                  href={facebookUrl}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Facebook"
@@ -81,7 +103,7 @@ export default function ContactPage() {
                   <FacebookIcon />
                 </a>
                 <a
-                  href="https://www.instagram.com/westmauirentals/"
+                  href={instagramUrl}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Instagram"
@@ -93,11 +115,7 @@ export default function ContactPage() {
             </Reveal>
 
             <Reveal delay={200} className="rounded-3xl bg-gold/10 p-6">
-              <p className="text-sm leading-relaxed text-ink/70">
-                Held to Airbnb Superhost and VRBO Premier Host standards
-                &mdash; expect a reply within the hour during normal waking
-                hours in Hawaii.
-              </p>
+              <p className="text-sm leading-relaxed text-ink/70">{trustNote}</p>
             </Reveal>
           </div>
         </div>

@@ -5,6 +5,7 @@ import reef from "@/public/images/stock/snorkeling-reef.jpg";
 import paddleboard from "@/public/images/stock/paddleboard-sunset.jpg";
 import birdsSunrise from "@/public/images/stock/beach-birds-sunrise.jpg";
 import { FishIcon, PaddleboardIcon, SunriseIcon, UmbrellaIcon } from "@/components/ExploreIcons";
+import { getPageSections, str } from "@/lib/cms";
 
 const highlights = [
   {
@@ -37,14 +38,21 @@ const highlights = [
   },
 ];
 
-export default function ExploreIsland() {
+export default async function ExploreIsland() {
+  const sections = await getPageSections("home");
+  const explore = sections.explore ?? {};
+
   return (
     <section className="bg-sand-dark/40 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading
-          eyebrow="Explore the Island"
-          title="More than just a place to stay"
-          description="Every condo puts you minutes from the beaches, reefs, and sunsets that make Maui unlike anywhere else."
+          eyebrow={str(explore, "eyebrow", "Explore the Island")}
+          title={str(explore, "heading", "More than just a place to stay")}
+          description={str(
+            explore,
+            "description",
+            "Every condo puts you minutes from the beaches, reefs, and sunsets that make Maui unlike anywhere else.",
+          )}
           align="center"
         />
 

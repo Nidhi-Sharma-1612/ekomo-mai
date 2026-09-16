@@ -17,7 +17,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "E Komo Mai Vacation Rentals | Oceanfront Maui Condos",
+  title: "LahainaOceanfrontRentals | Oceanfront Maui Condos",
   description:
     "Handpicked oceanfront condos in Lahaina & Kaanapali, Maui, hosted by Louis & Kristine Trinh. Aloha-spirit hospitality, transparent pricing, and front-row sunsets.",
 };

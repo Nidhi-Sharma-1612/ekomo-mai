@@ -60,7 +60,7 @@ export async function ensureReservationCreated({
     totalPrice,
     currency: "USD",
     status: "new",
-    comment: `Booked via ekomomaivacationrentals.com direct-booking site — Stripe session ${stripeSessionId}`,
+    comment: `Booked via lahainaoceanfrontrentals.com direct-booking site — Stripe session ${stripeSessionId}`,
   });
 
   return { created: true, reservationId: reservation.id };

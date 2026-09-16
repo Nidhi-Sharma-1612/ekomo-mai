@@ -8,7 +8,7 @@ import { getPropertyBySlug } from "@/lib/hostaway/getProperties";
 import { ensureReservationCreated } from "@/lib/hostaway/reservations";
 
 export const metadata: Metadata = {
-  title: "Booking Confirmation | E Komo Mai Vacation Rentals",
+  title: "Booking Confirmation | LahainaOceanfrontRentals",
 };
 
 export default async function BookingSuccessPage(props: PageProps<"/booking/success">) {

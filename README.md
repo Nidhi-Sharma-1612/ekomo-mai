@@ -1,6 +1,6 @@
-# E Komo Mai Vacation Rentals
+# LahainaOceanfrontRentals
 
-A direct-booking marketing website for E Komo Mai Vacation Rentals — oceanfront
+A direct-booking marketing website for LahainaOceanfrontRentals — oceanfront
 condos across Lahaina & Kaanapali, Maui, hosted by Louis & Kristine Trinh.
 Redesigned from the original WordPress site into a modern, fast, static
 Next.js site, with real content (photos, descriptions, pricing) pulled from
