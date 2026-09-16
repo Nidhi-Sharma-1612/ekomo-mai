@@ -1,4 +1,3 @@
-import Image from "next/image";
 import heroImageA from "@/public/images/stock/hero-beach-sunset.jpg";
 import WaveDivider from "@/components/WaveDivider";
 import BookingWidget from "@/components/BookingWidget";
@@ -15,6 +14,8 @@ export default async function Hero() {
     "description",
     "Handpicked oceanfront condos in Lahaina & Kaanapali, hosted with real Aloha spirit — and the front-row sunsets to prove it.",
   );
+  const heroVideo = str(hero, "heroVideo", "/videos/hero.mp4");
+  const heroImage = str(hero, "heroImage", heroImageA.src);
 
   // Preserves the original gold-accent styling on "Maui's" when that exact
   // word is present, but degrades gracefully to plain text if an editor
@@ -32,18 +33,16 @@ export default async function Hero() {
           muted
           loop
           playsInline
-          poster={heroImageA.src}
+          poster={heroImage}
           className="hero-video absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/videos/hero.mp4" type="video/mp4" />
+          <source src={heroVideo} type="video/mp4" />
         </video>
-        <Image
-          src={heroImageA}
+        {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+        <img
+          src={heroImage}
           alt="Golden sunset over a Maui beach"
-          fill
-          priority
-          sizes="100vw"
-          className="hero-video-fallback object-cover"
+          className="hero-video-fallback absolute inset-0 h-full w-full object-cover"
         />
 
         {/* Contrast scrim so the headline and widget stay readable over any frame — kept light enough that the video's real color still shows through */}

@@ -41,10 +41,11 @@ export default async function ContactPage() {
   const phoneDigits = phone.replace(/[^\d+]/g, "");
   const facebookUrl = settings?.socialLinks?.facebook ?? "https://www.facebook.com/E.Komo.Mai.Maui";
   const instagramUrl = settings?.socialLinks?.instagram ?? "https://www.instagram.com/westmauirentals/";
+  const pageHeroImage = str(intro, "heroImage", heroImage.src);
 
   return (
     <>
-      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={heroImage} />
+      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={pageHeroImage} />
 
       <section className="relative overflow-hidden py-20">
         <div
@@ -61,7 +62,7 @@ export default async function ContactPage() {
             <h2 className="font-serif text-2xl text-ink">{formHeading}</h2>
             <p className="mt-2 text-sm text-ink/60">{formSubtext}</p>
             <div className="mt-8">
-              <ContactForm />
+              <ContactForm email={email} />
             </div>
           </Reveal>
 

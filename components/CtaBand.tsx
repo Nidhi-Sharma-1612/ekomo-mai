@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Home, Tag } from "lucide-react";
 import bg from "@/public/images/stock/beach-birds-sunrise.jpg";
@@ -21,15 +20,15 @@ export default async function CtaBand() {
     "description",
     "Reach out and we'll help you find the right oceanfront condo for your Maui getaway.",
   );
+  const backgroundImage = str(cta, "backgroundImage", bg.src);
 
   return (
     <section className="relative isolate overflow-hidden py-28">
-      <Image
-        src={bg}
+      {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+      <img
+        src={backgroundImage}
         alt="Sunrise over a Maui beach with birds flying overhead"
-        fill
-        sizes="100vw"
-        className="animate-cta-zoom object-cover"
+        className="absolute inset-0 h-full w-full animate-cta-zoom object-cover"
       />
       <div className="absolute inset-0 bg-ocean-deep/80" />
       <div className="absolute inset-0 bg-linear-to-b from-ocean-deep/50 via-transparent to-ocean-deep/50" />

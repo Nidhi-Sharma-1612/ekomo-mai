@@ -34,6 +34,7 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
     "From honeymoon studios to resort-style condos with room for the family — each one hosted with real Aloha spirit.",
   );
   const regionText = str(intro, "regionText", "Oceanfront condos in Lahaina & Kaanapali, West Maui");
+  const pageHeroImage = str(intro, "heroImage", heroImage.src);
 
   let properties = allProperties;
   if (guests) {
@@ -64,7 +65,7 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
 
   return (
     <>
-      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={heroImage} />
+      <PageHero eyebrow={eyebrow} title={heroTitle} description={heroDescription} image={pageHeroImage} />
 
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">

@@ -6,6 +6,7 @@ import { getStripe } from "@/lib/stripe";
 import { formatDisplayDate, parseISODate } from "@/lib/date";
 import { getPropertyBySlug } from "@/lib/hostaway/getProperties";
 import { ensureReservationCreated } from "@/lib/hostaway/reservations";
+import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "Booking Confirmation | LahainaOceanfrontRentals",
@@ -64,6 +65,29 @@ export default async function BookingSuccessPage(props: PageProps<"/booking/succ
     notFound();
   }
 
+  const sections = await getPageSections("booking-success");
+  const content = sections.content ?? {};
+
+  const confirmedHeading = str(content, "confirmedHeading", "Booking confirmed!");
+  const pendingHeading = str(content, "pendingHeading", "Payment received!");
+  const confirmedSuffix = str(
+    content,
+    "confirmedSuffix",
+    " is booked and your dates are reserved. We can't wait to welcome you.",
+  );
+  const pendingSuffix = str(
+    content,
+    "pendingSuffix",
+    " is being finalized on our end — we'll confirm your exact dates by email within 24 hours.",
+  );
+  const failedHeading = str(content, "failedHeading", "Payment not completed");
+  const failedBody = str(
+    content,
+    "failedBody",
+    "We couldn't confirm this payment. If you believe you were charged, please contact us and we'll sort it out right away.",
+  );
+  const ctaLabel = str(content, "ctaLabel", "Browse more properties");
+
   return (
     <section className="flex min-h-[65vh] items-center py-24">
       <div className="mx-auto max-w-xl px-6 text-center">
@@ -78,7 +102,7 @@ export default async function BookingSuccessPage(props: PageProps<"/booking/succ
         {paid ? (
           <>
             <h1 className="mt-6 font-serif text-3xl text-ink">
-              {reservationOutcome === "auto" ? "Booking confirmed!" : "Payment received!"}
+              {reservationOutcome === "auto" ? confirmedHeading : pendingHeading}
             </h1>
             <p className="mt-3 text-ink/70">
               {propertyName ? `Your stay at ${propertyName}` : "Your stay"}
@@ -89,9 +113,7 @@ export default async function BookingSuccessPage(props: PageProps<"/booking/succ
                 </>
               )}
               {guests ? `, ${guests} guest${Number(guests) > 1 ? "s" : ""}` : ""}
-              {reservationOutcome === "auto"
-                ? " is booked and your dates are reserved. We can't wait to welcome you."
-                : " is being finalized on our end — we'll confirm your exact dates by email within 24 hours."}
+              {reservationOutcome === "auto" ? confirmedSuffix : pendingSuffix}
             </p>
             {amount !== null && (
               <p className="mt-5 font-serif text-3xl text-ink">
@@ -101,11 +123,8 @@ export default async function BookingSuccessPage(props: PageProps<"/booking/succ
           </>
         ) : (
           <>
-            <h1 className="mt-6 font-serif text-3xl text-ink">Payment not completed</h1>
-            <p className="mt-3 text-ink/70">
-              We couldn&apos;t confirm this payment. If you believe you were charged, please contact us and
-              we&apos;ll sort it out right away.
-            </p>
+            <h1 className="mt-6 font-serif text-3xl text-ink">{failedHeading}</h1>
+            <p className="mt-3 text-ink/70">{failedBody}</p>
           </>
         )}
 
@@ -113,7 +132,7 @@ export default async function BookingSuccessPage(props: PageProps<"/booking/succ
           href="/properties"
           className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-ocean px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-ocean-deep"
         >
-          Browse more properties
+          {ctaLabel}
         </Link>
       </div>
     </section>

@@ -25,9 +25,29 @@ const accents = [
   { badge: "bg-gold/15 text-gold", ring: "hover:ring-gold/40" },
 ];
 
+function isItemOverrides(value: unknown): value is { title: string; description: string }[] {
+  return (
+    Array.isArray(value) &&
+    value.length === serviceHighlights.length &&
+    value.every(
+      (v) =>
+        v &&
+        typeof v === "object" &&
+        typeof (v as { title?: unknown }).title === "string" &&
+        typeof (v as { description?: unknown }).description === "string",
+    )
+  );
+}
+
 export default async function ServiceHighlights() {
   const sections = await getPageSections("home");
   const services = sections.services ?? {};
+  const overrides = isItemOverrides(services.items) ? services.items : null;
+  const items = serviceHighlights.map((service, i) => ({
+    ...service,
+    title: overrides ? overrides[i].title : service.title,
+    description: overrides ? overrides[i].description : service.description,
+  }));
 
   return (
     <section className="bg-sand-dark/40 py-24">
@@ -44,7 +64,7 @@ export default async function ServiceHighlights() {
         />
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {serviceHighlights.map((service, i) => {
+          {items.map((service, i) => {
             const Icon = icons[service.id as keyof typeof icons];
             const accent = accents[i % accents.length];
 

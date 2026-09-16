@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
 import { HeartIcon, PalmIcon, StarIcon } from "@/components/StoryIcons";
@@ -28,6 +27,14 @@ const highlights = [
   { icon: UmbrellaIcon, label: "The Road to Hana" },
 ];
 
+function isHighlightLabels(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length === highlights.length &&
+    value.every((v) => typeof v === "string")
+  );
+}
+
 export default async function AboutPage() {
   const sections = await getPageSections("about");
   const story = sections.story ?? {};
@@ -51,10 +58,17 @@ export default async function AboutPage() {
     "paragraph3",
     "We started LahainaOceanfrontRentals to share that feeling with every guest who stays with us — hosting each condo the way we'd want to be hosted ourselves.",
   );
+  const pageHeroImage = str(story, "heroImage", heroImage.src);
+  const founderImage = str(story, "founderImage", founders.src);
+  const reefImage = str(story, "reefImage", reef.src);
+  const highlightLabels = isHighlightLabels(story.highlightLabels)
+    ? story.highlightLabels
+    : highlights.map((h) => h.label);
+  const reefHighlights = highlights.map((h, i) => ({ ...h, label: highlightLabels[i] }));
 
   return (
     <>
-      <PageHero eyebrow={eyebrow} title={title} image={heroImage} />
+      <PageHero eyebrow={eyebrow} title={title} image={pageHeroImage} />
 
       <section className="relative overflow-hidden py-20">
         <div
@@ -69,12 +83,11 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:items-center">
           <Reveal className="relative">
             <div className="relative aspect-4/5 overflow-hidden rounded-tl-[5rem] rounded-tr-2xl rounded-br-[5rem] rounded-bl-2xl shadow-xl shadow-ocean-deep/10 sm:aspect-4/3">
-              <Image
-                src={founders}
+              {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+              <img
+                src={founderImage}
                 alt="Louis and Kristine Trinh on a boat off the coast of Maui"
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
 
@@ -113,17 +126,16 @@ export default async function AboutPage() {
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6">
           <Reveal className="relative aspect-21/9 overflow-hidden rounded-3xl">
-            <Image
-              src={reef}
+            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+            <img
+              src={reefImage}
               alt="Scuba divers exploring a Hawaiian reef"
-              fill
-              sizes="100vw"
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-linear-to-t from-ocean-deep/80 via-ocean-deep/10 to-transparent" />
 
             <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-x-8 gap-y-3 p-6 sm:p-8">
-              {highlights.map((item) => (
+              {reefHighlights.map((item) => (
                 <span
                   key={item.label}
                   className="flex items-center gap-2 text-sm font-semibold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]"

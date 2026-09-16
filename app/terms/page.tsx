@@ -67,6 +67,7 @@ export default async function TermsPage() {
 
   const lastUpdated = str(body, "lastUpdated", "Last updated September 2026");
   const legalSections = isSectionList(body.sections) ? body.sections : DEFAULT_SECTIONS;
+  const pageHeroImage = str(body, "heroImage", heroImage.src);
 
   return (
     <>
@@ -74,7 +75,7 @@ export default async function TermsPage() {
         eyebrow="Legal"
         title="Terms & Conditions"
         description={lastUpdated}
-        image={heroImage}
+        image={pageHeroImage}
       />
 
       <section className="py-16">

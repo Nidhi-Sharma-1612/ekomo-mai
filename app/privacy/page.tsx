@@ -66,10 +66,16 @@ export default async function PrivacyPolicyPage() {
 
   const lastUpdated = str(body, "lastUpdated", "Last updated September 2026");
   const legalSections = isSectionList(body.sections) ? body.sections : DEFAULT_SECTIONS;
+  const pageHeroImage = str(body, "heroImage", heroImage.src);
 
   return (
     <>
-      <PageHero eyebrow="Legal" title="Privacy Policy" description={lastUpdated} image={heroImage} />
+      <PageHero
+        eyebrow="Legal"
+        title="Privacy Policy"
+        description={lastUpdated}
+        image={pageHeroImage}
+      />
 
       <section className="py-16">
         <div className="mx-auto max-w-3xl px-6">

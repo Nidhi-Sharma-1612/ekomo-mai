@@ -12,13 +12,20 @@ export default function PropertyBookingCard({
   initialCheckIn,
   initialCheckOut,
   initialGuests,
+  email,
+  phone,
+  trustBadges,
 }: {
   property: Property;
   /** ISO (yyyy-mm-dd) — carried over from a homepage/listing-page search. */
   initialCheckIn?: string;
   initialCheckOut?: string;
   initialGuests?: number;
+  email: string;
+  phone: string;
+  trustBadges: [string, string];
 }) {
+  const phoneDigits = phone.replace(/[^\d+]/g, "");
   const [checkIn, setCheckIn] = useState<Date | null>(() =>
     initialCheckIn ? parseISODate(initialCheckIn) : null
   );
@@ -312,25 +319,25 @@ export default function PropertyBookingCard({
       <div className="mt-6 space-y-3 border-t border-ink/10 pt-6 text-sm text-ink/60">
         <p className="font-semibold text-ink/70">Questions before you book?</p>
         <a
-          href="mailto:pahiatrinh@gmail.com"
+          href={`mailto:${email}`}
           className="flex items-center gap-2.5 font-semibold text-ocean transition-colors hover:text-ocean-deep"
         >
           <MailIcon className="shrink-0" />
-          pahiatrinh@gmail.com
+          {email}
         </a>
         <a
-          href="tel:+17707145258"
+          href={`tel:${phoneDigits}`}
           className="flex items-center gap-2.5 font-semibold text-ocean transition-colors hover:text-ocean-deep"
         >
           <PhoneIcon className="shrink-0" />
-          +1 (770) 714-5258
+          {phone}
         </a>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-x-4 gap-y-1 border-t border-ink/10 pt-4 text-[11px] font-semibold uppercase tracking-wide text-ink/45">
-        <span>Superhost Rated</span>
+        <span>{trustBadges[0]}</span>
         <span aria-hidden="true">&middot;</span>
-        <span>Book Direct, No Fees</span>
+        <span>{trustBadges[1]}</span>
       </div>
     </div>
   );

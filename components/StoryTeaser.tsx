@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import founders from "@/public/images/about/founders.jpeg";
@@ -28,6 +27,7 @@ export default async function StoryTeaser() {
     "We built LahainaOceanfrontRentals to share that feeling with every guest who stays with us — real Aloha spirit, from booking to check-out.",
   );
   const linkLabel = str(about, "linkLabel", "Read our full story");
+  const founderImage = str(about, "founderImage", founders.src);
 
   return (
     <section className="relative overflow-hidden py-24">
@@ -47,12 +47,11 @@ export default async function StoryTeaser() {
       <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:items-center">
         <div className="relative">
           <div className="relative aspect-4/5 overflow-hidden rounded-tl-[5rem] rounded-tr-2xl rounded-br-[5rem] rounded-bl-2xl shadow-xl shadow-ocean-deep/10 sm:aspect-4/3">
-            <Image
-              src={founders}
+            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+            <img
+              src={founderImage}
               alt="Louis and Kristine Trinh, founders of LahainaOceanfrontRentals, on a boat off the coast of Maui"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
 

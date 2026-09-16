@@ -3,6 +3,7 @@ import { getFeaturedTestimonials } from "@/lib/hostaway/reviews";
 import SectionHeading from "@/components/SectionHeading";
 import { StarIcon } from "@/components/StoryIcons";
 import type { Testimonial } from "@/lib/types";
+import { getPageSections, str } from "@/lib/cms";
 
 const accents = ["bg-ocean/10 text-ocean", "bg-palm/10 text-palm", "bg-gold/15 text-gold"];
 
@@ -56,7 +57,11 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 }
 
 export default async function Testimonials() {
-  const liveTestimonials = await getFeaturedTestimonials();
+  const [liveTestimonials, sections] = await Promise.all([
+    getFeaturedTestimonials(),
+    getPageSections("home"),
+  ]);
+  const testimonialsSection = sections.testimonials ?? {};
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : fallbackTestimonials;
   const track = [...testimonials, ...testimonials];
 
@@ -64,8 +69,8 @@ export default async function Testimonials() {
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading
-          eyebrow="Guest Stories"
-          title="What guests are saying"
+          eyebrow={str(testimonialsSection, "eyebrow", "Guest Stories")}
+          title={str(testimonialsSection, "heading", "What guests are saying")}
           align="center"
         />
       </div>

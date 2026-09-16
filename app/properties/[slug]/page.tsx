@@ -14,6 +14,7 @@ import AmenitiesList from "@/components/AmenitiesList";
 import { ArrowLeft } from "lucide-react";
 import { BathIcon, BedIcon, GuestsIcon } from "@/components/PropertyIcons";
 import { PinIcon } from "@/components/FooterIcons";
+import { getPageSections, getSiteSettings, str } from "@/lib/cms";
 
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
@@ -50,9 +51,21 @@ export default async function PropertyDetailPage(
   const initialCheckOut = typeof searchParams.checkOut === "string" ? searchParams.checkOut : undefined;
   const initialGuests = typeof searchParams.guests === "string" ? Number(searchParams.guests) : undefined;
 
-  const allProperties = await getAllProperties();
+  const [allProperties, sections, settings] = await Promise.all([
+    getAllProperties(),
+    getPageSections("global"),
+    getSiteSettings(),
+  ]);
   const otherProperties = allProperties.filter((p) => p.slug !== slug);
   const descriptionBlocks = parseDescriptionBlocks(property.longDescription);
+
+  const propertyBooking = sections.propertyBooking ?? {};
+  const email = settings?.email ?? "pahiatrinh@gmail.com";
+  const phone = settings?.phone ?? "+1 (770) 714-5258";
+  const trustBadges: [string, string] = [
+    str(propertyBooking, "trustBadge1", "Superhost Rated"),
+    str(propertyBooking, "trustBadge2", "Book Direct, No Fees"),
+  ];
 
   return (
     <>
@@ -141,6 +154,9 @@ export default async function PropertyDetailPage(
               initialCheckIn={initialCheckIn}
               initialCheckOut={initialCheckOut}
               initialGuests={initialGuests}
+              email={email}
+              phone={phone}
+              trustBadges={trustBadges}
             />
           </div>
 

@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Calendar, Mail, MessageSquare, User } from "lucide-react";
 
-export default function ContactForm() {
+export default function ContactForm({ email }: { email: string }) {
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -20,8 +20,8 @@ export default function ContactForm() {
         <p className="mt-2 text-sm text-ink/70">
           We typically respond within the hour. In the meantime, feel free to
           email us directly at{" "}
-          <a href="mailto:pahiatrinh@gmail.com" className="font-semibold text-ocean">
-            pahiatrinh@gmail.com
+          <a href={`mailto:${email}`} className="font-semibold text-ocean">
+            {email}
           </a>
           .
         </p>
