@@ -8,7 +8,7 @@ import { getPageSections, str } from "@/lib/cms";
 export default async function FeaturedProperties() {
   const [properties, sections] = await Promise.all([getAllProperties(), getPageSections("home")]);
   const featuredProperties = sections.featuredProperties ?? {};
-  const [featured, ...rest] = properties;
+  const [featured, wide, ...rest] = properties;
 
   if (!featured) return null;
 
@@ -37,15 +37,19 @@ export default async function FeaturedProperties() {
         </div>
 
         {/*
-          Purpose-built for exactly 3 properties: one tall featured card on the
-          left, the other two stacked on the right. Grid auto-placement fills
-          both right-hand cells without needing per-card span overrides, so
-          there's no gap or uneven sizing at any breakpoint.
+          Bento layout for 4 properties: a tall featured card on the left, a
+          wide card top-right, and two smaller cards splitting the
+          bottom-right. Stacks to a single column on mobile.
         */}
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:grid-rows-2 sm:h-140">
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:grid-rows-2 sm:h-140">
           <div className="sm:row-span-2">
             <PropertyCard property={featured} adaptive emphasis />
           </div>
+          {wide && (
+            <div className="sm:col-span-2">
+              <PropertyCard property={wide} adaptive />
+            </div>
+          )}
           {rest.map((property) => (
             <PropertyCard key={property.id} property={property} adaptive />
           ))}

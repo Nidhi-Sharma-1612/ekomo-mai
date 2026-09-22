@@ -48,6 +48,9 @@ export default async function ContactPage() {
   const facebookUrl = settings?.socialLinks?.facebook ?? "https://www.facebook.com/E.Komo.Mai.Maui";
   const instagramUrl = settings?.socialLinks?.instagram ?? "https://www.instagram.com/westmauirentals/";
   const pageHeroImage = str(intro, "heroImage", heroImage.src);
+  const directContactHeading = str(intro, "directContactHeading", "Direct Contact");
+  const hostName = str(intro, "hostName", "Louis & Kristine Trinh");
+  const followAlongHeading = str(intro, "followAlongHeading", "Follow Along");
 
   return (
     <>
@@ -74,8 +77,8 @@ export default async function ContactPage() {
 
           <div className="space-y-6">
             <Reveal delay={100} className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-ink/5">
-              <h3 className="font-serif text-lg text-ink">Direct Contact</h3>
-              <p className="mt-2 text-sm font-medium text-ink/80">Louis & Kristine Trinh</p>
+              <h3 className="font-serif text-lg text-ink">{directContactHeading}</h3>
+              <p className="mt-2 text-sm font-medium text-ink/80">{hostName}</p>
               <div className="mt-4 space-y-3 text-sm">
                 <a
                   href={`mailto:${email}`}
@@ -99,7 +102,7 @@ export default async function ContactPage() {
             </Reveal>
 
             <Reveal delay={150} className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-ink/5">
-              <h3 className="font-serif text-lg text-ink">Follow Along</h3>
+              <h3 className="font-serif text-lg text-ink">{followAlongHeading}</h3>
               <div className="mt-4 flex gap-3">
                 <a
                   href={facebookUrl}
