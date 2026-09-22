@@ -9,6 +9,7 @@ import {
   isAfter,
   isBefore,
   isSameDay,
+  isValidStayRange,
   nightsBetween,
   startOfDay,
   toISODate,
@@ -175,15 +176,19 @@ function DayCell({
   const { date, isCurrentMonth } = day;
   const iso = toISODate(date);
   const isPast = isBefore(date, today);
-  const isBooked = unavailableDates?.has(iso) ?? false;
 
-  // While picking a check-out date, disable candidates that don't satisfy
-  // the check-in date's minimum-stay requirement.
+  // While picking a check-out date, a candidate's own availability doesn't
+  // matter (checkout morning can coincide with another guest's same-day
+  // check-in) — what matters is every *night* from check-in up to it being
+  // free, and the stay meeting check-in's minimum-stay requirement.
+  const isCheckoutCandidate = !!checkIn && !checkOut && isAfter(date, checkIn);
   const minNights = checkIn ? (minStayByDate?.[toISODate(checkIn)] ?? 1) : 1;
-  const isTooSoon =
-    !!checkIn && !checkOut && isAfter(date, checkIn) && nightsBetween(checkIn, date) < minNights;
 
-  const disabled = isPast || !isCurrentMonth || isBooked || isTooSoon;
+  const isBooked = !isCheckoutCandidate && (unavailableDates?.has(iso) ?? false);
+  const isInvalidCheckout =
+    isCheckoutCandidate && !isValidStayRange(checkIn!, date, unavailableDates ?? new Set(), minStayByDate);
+
+  const disabled = isPast || !isCurrentMonth || isBooked || isInvalidCheckout;
   const price = priceByDate?.[iso];
 
   const isStart = isSameDay(date, checkIn);
@@ -222,8 +227,10 @@ function DayCell({
         title={
           isBooked
             ? "Not available"
-            : isTooSoon
-              ? `${minNights}-night minimum stay`
+            : isInvalidCheckout
+              ? nightsBetween(checkIn!, date) < minNights
+                ? `${minNights}-night minimum stay`
+                : "Dates in this range are already booked"
               : undefined
         }
         className={[

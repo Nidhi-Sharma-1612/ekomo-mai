@@ -6,6 +6,7 @@ import Reveal from "@/components/Reveal";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "@/components/FooterIcons";
 import heroImage from "@/public/images/stock/poolside-dusk.jpg";
 import { getPageSections, getSiteSettings, str } from "@/lib/cms";
+import { getAllProperties } from "@/lib/hostaway/getProperties";
 
 export const metadata: Metadata = {
   title: "Contact Us | LahainaOceanfrontRentals",
@@ -14,7 +15,12 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const [sections, settings] = await Promise.all([getPageSections("contact"), getSiteSettings()]);
+  const [sections, settings, properties] = await Promise.all([
+    getPageSections("contact"),
+    getSiteSettings(),
+    getAllProperties(),
+  ]);
+  const propertyNames = properties.map((p) => p.name);
   const intro = sections.intro ?? {};
 
   const eyebrow = str(intro, "eyebrow", "Get in Touch");
@@ -62,13 +68,14 @@ export default async function ContactPage() {
             <h2 className="font-serif text-2xl text-ink">{formHeading}</h2>
             <p className="mt-2 text-sm text-ink/60">{formSubtext}</p>
             <div className="mt-8">
-              <ContactForm email={email} />
+              <ContactForm email={email} propertyNames={propertyNames} />
             </div>
           </Reveal>
 
           <div className="space-y-6">
             <Reveal delay={100} className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-ink/5">
               <h3 className="font-serif text-lg text-ink">Direct Contact</h3>
+              <p className="mt-2 text-sm font-medium text-ink/80">Louis & Kristine Trinh</p>
               <div className="mt-4 space-y-3 text-sm">
                 <a
                   href={`mailto:${email}`}

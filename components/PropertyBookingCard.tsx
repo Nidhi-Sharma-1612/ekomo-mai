@@ -2,7 +2,15 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import DateRangeCalendar from "@/components/DateRangeCalendar";
-import { addDays, formatDisplayDate, isAfter, nightsBetween, parseISODate, toISODate } from "@/lib/date";
+import {
+  addDays,
+  formatDisplayDate,
+  isAfter,
+  isValidStayRange,
+  nightsBetween,
+  parseISODate,
+  toISODate,
+} from "@/lib/date";
 import { calculateTotal } from "@/lib/pricing";
 import type { Property } from "@/lib/types";
 import { MailIcon, PhoneIcon } from "@/components/FooterIcons";
@@ -90,15 +98,18 @@ export default function PropertyBookingCard({
       return;
     }
 
-    if (isAfter(date, checkIn)) {
-      const minNights = minStayByDate[toISODate(checkIn)] ?? 1;
-      if (nightsBetween(checkIn, date) < minNights) return; // calendar already disables these; guard anyway
+    // A later date completes the stay only if it's actually a valid checkout
+    // (every night free, minimum stay met) — otherwise treat the click as
+    // restarting the selection with this as the new check-in, so picking a
+    // date that doesn't work as checkout never leaves the calendar stuck.
+    if (isAfter(date, checkIn) && isValidStayRange(checkIn, date, unavailableDates, minStayByDate)) {
       setCheckOut(date);
       setCalendarOpen(false);
-    } else {
-      setCheckIn(date);
-      setCheckOut(null);
+      return;
     }
+
+    setCheckIn(date);
+    setCheckOut(null);
   }
 
   function handleClearDates() {
@@ -118,8 +129,12 @@ export default function PropertyBookingCard({
     }
 
     const minNights = minStayByDate[toISODate(checkIn)] ?? 1;
-    if (nightsBetween(checkIn, checkOut) < minNights) {
-      setBookingError(`This property requires a minimum stay of ${minNights} nights for that check-in date.`);
+    if (!isValidStayRange(checkIn, checkOut, unavailableDates, minStayByDate)) {
+      setBookingError(
+        nightsBetween(checkIn, checkOut) < minNights
+          ? `This property requires a minimum stay of ${minNights} nights for that check-in date.`
+          : "Some nights in that range are no longer available. Please pick different dates."
+      );
       return;
     }
 

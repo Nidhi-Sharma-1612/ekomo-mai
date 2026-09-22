@@ -39,6 +39,34 @@ export function nightsBetween(a: Date, b: Date): number {
   return Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / 86_400_000);
 }
 
+/**
+ * Whether every night from checkIn (inclusive) to checkOut (exclusive) is
+ * bookable and the stay meets checkIn's minimum-stay requirement. The
+ * checkOut date's own availability never matters — checkout morning can
+ * coincide with another guest's same-day check-in (a normal turnover), so
+ * checking `unavailableDates.has(checkOut)` would wrongly reject valid
+ * same-day-turnover checkouts.
+ */
+export function isValidStayRange(
+  checkIn: Date,
+  checkOut: Date,
+  unavailableDates: Set<string>,
+  minStayByDate?: Record<string, number>
+): boolean {
+  const nights = nightsBetween(checkIn, checkOut);
+  if (nights < 1) return false;
+
+  const minNights = minStayByDate?.[toISODate(checkIn)] ?? 1;
+  if (nights < minNights) return false;
+
+  let cursor = checkIn;
+  for (let i = 0; i < nights; i++) {
+    if (unavailableDates.has(toISODate(cursor))) return false;
+    cursor = addDays(cursor, 1);
+  }
+  return true;
+}
+
 /** Builds a 6-week grid for the given month, padded with adjacent-month days. */
 export function buildMonthGrid(year: number, month: number): CalendarDay[][] {
   const firstOfMonth = new Date(year, month, 1);

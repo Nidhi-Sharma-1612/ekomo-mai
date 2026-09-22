@@ -2,7 +2,7 @@ import "server-only";
 import type { Property } from "@/lib/types";
 import { HOSTAWAY_LISTINGS } from "@/lib/hostaway/listings";
 import { normalizeListing } from "@/lib/hostaway/normalize";
-import { fetchListing } from "@/lib/hostaway/client";
+import { fetchCancellationPolicies, fetchListing } from "@/lib/hostaway/client";
 import { getAverageNightlyRate } from "@/lib/hostaway/pricing";
 
 async function withLiveRate(property: Property): Promise<Property> {
@@ -13,10 +13,12 @@ async function withLiveRate(property: Property): Promise<Property> {
 
 /** All properties shown on the site — the live Hostaway listings. */
 export async function getAllProperties(): Promise<Property[]> {
+  const cancellationPolicies = await fetchCancellationPolicies().catch(() => []);
+
   const results = await Promise.allSettled(
     HOSTAWAY_LISTINGS.map(async (config) => {
       const raw = await fetchListing(config.id);
-      return withLiveRate(normalizeListing(raw, config));
+      return withLiveRate(normalizeListing(raw, config, cancellationPolicies));
     })
   );
 
@@ -36,8 +38,11 @@ export async function getPropertyBySlug(slug: string): Promise<Property | undefi
   const config = HOSTAWAY_LISTINGS.find((l) => l.slug === slug);
   if (!config) return undefined;
 
-  const raw = await fetchListing(config.id);
-  return withLiveRate(normalizeListing(raw, config));
+  const [raw, cancellationPolicies] = await Promise.all([
+    fetchListing(config.id),
+    fetchCancellationPolicies().catch(() => []),
+  ]);
+  return withLiveRate(normalizeListing(raw, config, cancellationPolicies));
 }
 
 export function getAllSlugs(): string[] {

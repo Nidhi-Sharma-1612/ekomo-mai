@@ -1,16 +1,51 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Calendar, Mail, MessageSquare, User } from "lucide-react";
+import { Building2, Calendar, Mail, MessageSquare, User } from "lucide-react";
 
-export default function ContactForm({ email }: { email: string }) {
+export default function ContactForm({
+  email,
+  propertyNames,
+}: {
+  email: string;
+  propertyNames: string[];
+}) {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // No backend wired up yet — swap this for a real submit handler
-    // (API route, server action, or email service) when ready to go live.
-    setSubmitted(true);
+    setError(null);
+    setSubmitting(true);
+
+    const form = event.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          property: data.get("property"),
+          dates: data.get("dates"),
+          message: data.get("message"),
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || "Something went wrong. Please try again.");
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -60,18 +95,39 @@ export default function ContactForm({ email }: { email: string }) {
         </div>
       </div>
 
-      <div>
-        <label htmlFor="dates" className="flex items-center gap-1.5 text-sm font-medium text-ink/80">
-          <Calendar size={15} strokeWidth={1.75} className="text-ocean" />
-          Preferred dates (optional)
-        </label>
-        <input
-          id="dates"
-          name="dates"
-          type="text"
-          placeholder="e.g. March 12 – March 19"
-          className="mt-2 w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm text-ink outline-none focus:border-ocean focus:ring-1 focus:ring-ocean"
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="property" className="flex items-center gap-1.5 text-sm font-medium text-ink/80">
+            <Building2 size={15} strokeWidth={1.75} className="text-ocean" />
+            Property (optional)
+          </label>
+          <select
+            id="property"
+            name="property"
+            defaultValue=""
+            className="mt-2 w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm text-ink outline-none focus:border-ocean focus:ring-1 focus:ring-ocean"
+          >
+            <option value="">Not sure / general question</option>
+            {propertyNames.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="dates" className="flex items-center gap-1.5 text-sm font-medium text-ink/80">
+            <Calendar size={15} strokeWidth={1.75} className="text-ocean" />
+            Preferred dates (optional)
+          </label>
+          <input
+            id="dates"
+            name="dates"
+            type="text"
+            placeholder="e.g. March 12 – March 19"
+            className="mt-2 w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm text-ink outline-none focus:border-ocean focus:ring-1 focus:ring-ocean"
+          />
+        </div>
       </div>
 
       <div>
@@ -88,11 +144,14 @@ export default function ContactForm({ email }: { email: string }) {
         />
       </div>
 
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
       <button
         type="submit"
-        className="inline-flex items-center justify-center rounded-full bg-ocean px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-ocean-deep"
+        disabled={submitting}
+        className="inline-flex items-center justify-center rounded-full bg-ocean px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-ocean-deep disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Send Message
+        {submitting ? "Sending..." : "Send Message"}
       </button>
     </form>
   );

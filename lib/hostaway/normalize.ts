@@ -1,3 +1,4 @@
+import type { HostawayCancellationPolicy } from "@/lib/hostaway/client";
 import type { CancellationTier, Property } from "@/lib/types";
 
 /** Strips emoji and stray symbols the listing name uses for OTA marketing flair. */
@@ -18,47 +19,32 @@ function formatHour(hour: number | null | undefined): string {
 }
 
 /**
- * Hostaway's listing.cancellationPolicy field returns a policy *name*, not
- * the full refund-tier text — the exact wording lives behind a separate
- * cancellation-policies lookup we haven't wired up. These are the standard,
- * widely-published definitions for each named tier; confirm against the
- * client's actual configured policy before relying on this for real guest
- * disputes.
+ * Hostaway's listing.cancellationPolicy field is a generic legacy/channel
+ * code (always "strict" on this account, regardless of the real configured
+ * policy) — not what's actually shown to guests. The real policy lives
+ * behind listing.cancellationPolicyId, resolved against the account's
+ * /v1/cancellationPolicies list (see lib/hostaway/client.ts), whose tiers
+ * are converted here into display text.
  */
-const CANCELLATION_POLICIES: Record<string, CancellationTier[]> = {
-  flexible: [
-    { window: "24+ hours before check-in", refund: "Full refund" },
-    { window: "Within 24 hours of check-in", refund: "No refund" },
-  ],
-  moderate: [
-    { window: "5+ days before check-in", refund: "Full refund" },
-    { window: "Within 5 days of check-in", refund: "No refund" },
-  ],
-  firm: [
-    { window: "30+ days before check-in", refund: "Full refund" },
-    { window: "7–29 days before check-in", refund: "50% refund" },
-    { window: "Within 7 days of check-in", refund: "No refund" },
-  ],
-  strict: [
-    { window: "14+ days before check-in", refund: "Full refund" },
-    { window: "7–13 days before check-in", refund: "50% refund" },
-    { window: "Within 7 days of check-in", refund: "No refund" },
-  ],
-  super_strict_30: [
-    { window: "30+ days before check-in", refund: "50% refund" },
-    { window: "Within 30 days of check-in", refund: "No refund" },
-  ],
-  super_strict_60: [
-    { window: "60+ days before check-in", refund: "50% refund" },
-    { window: "Within 60 days of check-in", refund: "No refund" },
-  ],
-};
+function cancellationTiersFromPolicy(
+  policy: HostawayCancellationPolicy | undefined
+): CancellationTier[] {
+  const items = policy?.cancellationPolicyItem ?? [];
+  if (items.length === 0) {
+    return [{ window: "Any time before check-in", refund: "No refund" }];
+  }
 
-const DEFAULT_CANCELLATION_TIERS: CancellationTier[] = CANCELLATION_POLICIES.strict;
+  const sorted = [...items].sort((a, b) => a.timeDelta - b.timeDelta);
+  const tiers: CancellationTier[] = sorted.map((item) => {
+    const days = Math.round(Math.abs(item.timeDelta) / 86_400);
+    const refund = item.refundAmount >= 100 ? "Full refund" : `${item.refundAmount}% refund`;
+    return { window: `${days}+ days before check-in`, refund };
+  });
 
-function cancellationTiersFor(policyName: string | null | undefined): CancellationTier[] {
-  if (!policyName) return DEFAULT_CANCELLATION_TIERS;
-  return CANCELLATION_POLICIES[policyName] ?? DEFAULT_CANCELLATION_TIERS;
+  const lastDays = Math.round(Math.abs(sorted[sorted.length - 1].timeDelta) / 86_400);
+  tiers.push({ window: `Within ${lastDays} days of check-in`, refund: "No refund" });
+
+  return tiers;
 }
 
 interface HostawayImage {
@@ -71,11 +57,16 @@ interface HostawayAmenity {
   amenityName: string;
 }
 
+/** Hawaii's combined Transient Accommodations Tax + General Excise Tax + Maui county surcharge, confirmed with the client. */
+const HAWAII_HOTEL_TAX_PERCENT = 18.712;
+
 /** Raw Hostaway listing object -> the Property shape every component consumes. */
 export function normalizeListing(
   raw: Record<string, unknown>,
-  config: { slug: string; resort: string }
+  config: { slug: string; resort: string },
+  cancellationPolicies: HostawayCancellationPolicy[] = []
 ): Property {
+  const matchedPolicy = cancellationPolicies.find((p) => p.id === raw.cancellationPolicyId);
   const images = ((raw.listingImages as HostawayImage[]) ?? [])
     .slice()
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
@@ -117,13 +108,12 @@ export function normalizeListing(
     checkInTime: formatHour(raw.checkInTimeStart as number | null),
     checkOutTime: formatHour(raw.checkOutTime as number | null),
     houseRulesText: (raw.houseRules as string | null) ?? undefined,
-    cancellationPolicyName: (raw.cancellationPolicy as string | null) ?? undefined,
-    cancellationTiers: cancellationTiersFor(raw.cancellationPolicy as string | null),
+    cancellationPolicyName: matchedPolicy?.name ?? (raw.cancellationPolicy as string | null) ?? undefined,
+    cancellationTiers: cancellationTiersFromPolicy(matchedPolicy),
     cleaningFee: (raw.cleaningFee as number) ?? 0,
     checkinFee: (raw.checkinFee as number) ?? 0,
-    // Disabled for now — Hostaway's propertyRentTax field (5%) doesn't reflect
-    // Maui's real combined tax rate, so tax is omitted until that's confirmed.
-    taxRatePercent: 0,
+    // Confirmed with the client: 18.712% combined Hawaii hotel tax, applied to all listings.
+    taxRatePercent: HAWAII_HOTEL_TAX_PERCENT,
     guestStayTax: (raw.guestStayTax as number) ?? 0,
     guestNightlyTax: (raw.guestNightlyTax as number) ?? 0,
     guestPerPersonPerNightTax: (raw.guestPerPersonPerNightTax as number) ?? 0,

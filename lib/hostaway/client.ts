@@ -210,3 +210,24 @@ export function fetchReviews(params?: Record<string, string | number>) {
     next: { revalidate: 3600 },
   });
 }
+
+export interface HostawayCancellationPolicyItem {
+  refundAmount: number;
+  refundType: "percentage" | string;
+  /** Seconds relative to the event (negative = before), e.g. -5184000 = 60 days before arrival. */
+  timeDelta: number;
+  event: "arrival" | string;
+}
+
+export interface HostawayCancellationPolicy {
+  id: number;
+  name: string;
+  cancellationPolicyItem: HostawayCancellationPolicyItem[];
+}
+
+/** The account's named cancellation policies (Firm, Moderate, etc.) — a listing references one by id. */
+export function fetchCancellationPolicies() {
+  return hostawayFetch<HostawayCancellationPolicy[]>(`/cancellationPolicies`, {
+    next: { revalidate: 3600 },
+  });
+}

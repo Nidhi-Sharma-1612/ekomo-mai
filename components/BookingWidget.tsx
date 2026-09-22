@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import DateRangeCalendar from "@/components/DateRangeCalendar";
-import { addDays, formatDisplayDate, isAfter, nightsBetween, toISODate } from "@/lib/date";
+import { addDays, formatDisplayDate, isAfter, isValidStayRange, toISODate } from "@/lib/date";
 
 function CalendarIcon() {
   return (
@@ -80,15 +80,14 @@ export default function BookingWidget() {
       return;
     }
 
-    if (isAfter(date, checkIn)) {
-      const minNights = minStayByDate[toISODate(checkIn)] ?? 1;
-      if (nightsBetween(checkIn, date) < minNights) return; // calendar already disables these; guard anyway
+    if (isAfter(date, checkIn) && isValidStayRange(checkIn, date, unavailableDates, minStayByDate)) {
       setCheckOut(date);
       setCalendarOpen(false);
-    } else {
-      setCheckIn(date);
-      setCheckOut(null);
+      return;
     }
+
+    setCheckIn(date);
+    setCheckOut(null);
   }
 
   function handleClearDates() {
