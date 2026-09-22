@@ -135,7 +135,7 @@ export default async function ContactPage() {
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6">
           <Reveal>
-            <MapEmbed lat={20.9367} lng={-156.6947} label="West Maui, Hawaii" />
+            <MapEmbed lat={20.9367} lng={-156.6905} label="West Maui, Hawaii" />
           </Reveal>
         </div>
       </section>
