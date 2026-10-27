@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
+import { isOptimizableImage } from "@/lib/cms";
 
 export default function PageHero({
   eyebrow,
@@ -13,12 +14,15 @@ export default function PageHero({
 }) {
   return (
     <section className="relative flex h-[50vh] min-h-[360px] items-end overflow-hidden">
-      {typeof image === "string" ? (
-        // eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain
-        <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <Image src={image} alt="" fill priority sizes="100vw" className="object-cover" />
-      )}
+      <Image
+        src={image}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        unoptimized={typeof image === "string" && !isOptimizableImage(image)}
+        className="object-cover"
+      />
       <div className="absolute inset-0 bg-linear-to-t from-ocean-deep/90 via-ocean-deep/55 to-ocean-deep/45" />
 
       <div className="relative mx-auto w-full max-w-7xl px-6 pb-16 text-sand">

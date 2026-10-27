@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import founders from "@/public/images/about/founders.jpeg";
 import { HeartIcon, PalmIcon, StarIcon } from "@/components/StoryIcons";
-import { getPageSections, str } from "@/lib/cms";
+import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 const facts = [
   { icon: PalmIcon, label: "30 years exploring Maui", accent: "bg-palm/10 text-palm" },
@@ -47,11 +48,13 @@ export default async function StoryTeaser() {
       <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:items-center">
         <div className="relative">
           <div className="relative aspect-4/5 overflow-hidden rounded-tl-[5rem] rounded-tr-2xl rounded-br-[5rem] rounded-bl-2xl shadow-xl shadow-ocean-deep/10 sm:aspect-4/3">
-            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
-            <img
+            <Image
               src={founderImage}
               alt="Louis and Kristine Trinh, founders of LahainaOceanfrontRentals, on a boat off the coast of Maui"
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              unoptimized={!isOptimizableImage(founderImage)}
+              className="object-cover"
             />
           </div>
 

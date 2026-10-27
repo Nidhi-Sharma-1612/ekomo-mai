@@ -3,10 +3,11 @@
 // calling component, so the live site keeps working even if the admin panel
 // or its database is unreachable.
 //
-// Deliberately uncached (`cache: "no-store"`): this is a low-traffic
-// marketing site, so a fresh request per page load is cheap, and it means a
-// client's edit in the admin panel is reflected on the very next page load
-// with zero cache-invalidation complexity.
+// Cached for a short window rather than fetched per request: an uncached CMS
+// call forced every page to render on demand and wait on the admin panel
+// before sending any HTML. A 60s revalidate keeps pages fast while a client's
+// edit in the admin panel still goes live within about a minute.
+const CMS_REVALIDATE_SECONDS = 60;
 const CMS_URL = process.env.ADMIN_PANEL_API_URL;
 const CMS_API_KEY = process.env.ADMIN_PANEL_API_KEY;
 const CMS_SITE_SLUG = "louise";
@@ -17,7 +18,7 @@ async function cmsFetch<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${CMS_URL}/api/public/${CMS_SITE_SLUG}${path}`, {
       headers: { "x-api-key": CMS_API_KEY },
-      cache: "no-store",
+      next: { revalidate: CMS_REVALIDATE_SECONDS },
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -54,6 +55,18 @@ export type CmsSettings = {
 export async function getSiteSettings(): Promise<CmsSettings | null> {
   const data = await cmsFetch<{ settings: CmsSettings | null }>("/settings");
   return data?.settings ?? null;
+}
+
+// next/image can only resize hosts allowed in next.config.mjs (local files and
+// this CMS's media). Any other URL an editor pastes in is passed through as-is
+// via `unoptimized` rather than crashing the page.
+export function isOptimizableImage(src: string): boolean {
+  if (src.startsWith("/")) return true;
+  try {
+    return !!CMS_URL && new URL(src).host === new URL(CMS_URL).host;
+  } catch {
+    return false;
+  }
 }
 
 // Small helper for reading a single string field off a section's content

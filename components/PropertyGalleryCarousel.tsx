@@ -4,7 +4,13 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import type { PropertyImage } from "@/lib/types";
 
-export default function PropertyGalleryCarousel({ images }: { images: PropertyImage[] }) {
+export default function PropertyGalleryCarousel({
+  images,
+  onOpen,
+}: {
+  images: PropertyImage[];
+  onOpen?: (index: number) => void;
+}) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
@@ -28,7 +34,13 @@ export default function PropertyGalleryCarousel({ images }: { images: PropertyIm
         className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto rounded-3xl"
       >
         {images.map((image, i) => (
-          <div key={i} className="relative aspect-4/3 w-full shrink-0 snap-center">
+          <button
+            key={i}
+            type="button"
+            onClick={() => onOpen?.(i)}
+            aria-label={`Open photo ${i + 1} full screen`}
+            className="relative aspect-4/3 w-full shrink-0 snap-center"
+          >
             <Image
               src={image.src}
               alt={image.alt}
@@ -37,7 +49,7 @@ export default function PropertyGalleryCarousel({ images }: { images: PropertyIm
               sizes="100vw"
               className="object-cover"
             />
-          </div>
+          </button>
         ))}
       </div>
 
@@ -47,20 +59,23 @@ export default function PropertyGalleryCarousel({ images }: { images: PropertyIm
             {index + 1} / {images.length}
           </span>
 
-          <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                aria-label={`Go to photo ${i + 1}`}
-                onClick={() => goTo(i)}
-                className={[
-                  "h-1.5 rounded-full transition-all",
-                  i === index ? "w-5 bg-white" : "w-1.5 bg-white/50",
-                ].join(" ")}
-              />
-            ))}
-          </div>
+          {/* Dots only make sense for a handful of photos — the counter covers larger sets. */}
+          {images.length <= 10 && (
+            <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`Go to photo ${i + 1}`}
+                  onClick={() => goTo(i)}
+                  className={[
+                    "h-1.5 rounded-full transition-all",
+                    i === index ? "w-5 bg-white" : "w-1.5 bg-white/50",
+                  ].join(" ")}
+                />
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

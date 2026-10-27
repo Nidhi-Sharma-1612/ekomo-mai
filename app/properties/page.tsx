@@ -5,7 +5,7 @@ import Reveal from "@/components/Reveal";
 import { getAllProperties } from "@/lib/hostaway/getProperties";
 import { isRangeAvailable } from "@/lib/hostaway/availability";
 import { formatDisplayDate, parseISODate } from "@/lib/date";
-import heroImage from "@/public/images/stock/beach-palms-sailboat.jpg";
+import heroImage from "@/public/images/maui/mahana-pool-ocean-view.jpg";
 import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = {

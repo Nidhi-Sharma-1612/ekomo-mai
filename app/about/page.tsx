@@ -1,12 +1,13 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
 import { HeartIcon, PalmIcon, StarIcon } from "@/components/StoryIcons";
 import { FishIcon, PaddleboardIcon, SunriseIcon, UmbrellaIcon } from "@/components/ExploreIcons";
-import heroImage from "@/public/images/stock/paddleboard-sunset.jpg";
+import heroImage from "@/public/images/maui/sunset-sunrays-palm.jpg";
 import founders from "@/public/images/about/founders.jpeg";
-import reef from "@/public/images/stock/snorkeling-reef.jpg";
-import { getPageSections, str } from "@/lib/cms";
+import sunsetBanner from "@/public/images/maui/sunset-pink-sky.jpg";
+import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "About Us | LahainaOceanfrontRentals",
@@ -60,7 +61,7 @@ export default async function AboutPage() {
   );
   const pageHeroImage = str(story, "heroImage", heroImage.src);
   const founderImage = str(story, "founderImage", founders.src);
-  const reefImage = str(story, "reefImage", reef.src);
+  const reefImage = str(story, "reefImage", sunsetBanner.src);
   const highlightLabels = isHighlightLabels(story.highlightLabels)
     ? story.highlightLabels
     : highlights.map((h) => h.label);
@@ -83,11 +84,13 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:items-center">
           <Reveal className="relative">
             <div className="relative aspect-4/5 overflow-hidden rounded-tl-[5rem] rounded-tr-2xl rounded-br-[5rem] rounded-bl-2xl shadow-xl shadow-ocean-deep/10 sm:aspect-4/3">
-              {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
-              <img
+              <Image
                 src={founderImage}
                 alt="Louis and Kristine Trinh on a boat off the coast of Maui"
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                unoptimized={!isOptimizableImage(founderImage)}
+                className="object-cover"
               />
             </div>
 
@@ -126,11 +129,13 @@ export default async function AboutPage() {
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6">
           <Reveal className="relative aspect-21/9 overflow-hidden rounded-3xl">
-            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
-            <img
+            <Image
               src={reefImage}
-              alt="Scuba divers exploring a Hawaiian reef"
-              className="absolute inset-0 h-full w-full object-cover"
+              alt="Pink and gold sunset over the Pacific from West Maui"
+              fill
+              sizes="(min-width: 1280px) 1232px, 100vw"
+              unoptimized={!isOptimizableImage(reefImage)}
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-linear-to-t from-ocean-deep/80 via-ocean-deep/10 to-transparent" />
 

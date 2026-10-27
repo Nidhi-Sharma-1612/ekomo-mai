@@ -4,7 +4,7 @@ import ContactForm from "@/components/ContactForm";
 import MapEmbed from "@/components/MapEmbed";
 import Reveal from "@/components/Reveal";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "@/components/FooterIcons";
-import heroImage from "@/public/images/stock/poolside-dusk.jpg";
+import heroImage from "@/public/images/maui/sunset-boats-under-tree.jpg";
 import { getPageSections, getSiteSettings, str } from "@/lib/cms";
 import { getAllProperties } from "@/lib/hostaway/getProperties";
 

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Raw client attachments (originals + admin-panel upload pack) — not site source
+/fwdlahainaoceanfrontrentalswebsite/

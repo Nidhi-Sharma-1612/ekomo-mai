@@ -4,16 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import logo from "@/public/images/logo.png";
+import logo from "@/public/images/logo-horizontal.png";
 
 export default function NavbarClient({
   brandName,
-  logoUrl,
   links,
   ctaLabel,
 }: {
   brandName: string;
-  logoUrl: string | null;
   links: { href: string; label: string }[];
   ctaLabel: string;
 }) {
@@ -35,6 +33,15 @@ export default function NavbarClient({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Largest over the home hero, easing down once the solid bar appears.
+  const logoClassName = [
+    "w-auto transition-all duration-300",
+    overHero
+      ? "h-16 md:h-24 drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+      : // Pastel yellow/green artwork washes out on the cream bar without a crisp edge shadow.
+        "h-14 md:h-16 drop-shadow-[0_0_1px_rgba(10,79,87,0.9)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]",
+  ].join(" ");
+
   return (
     <header
       className={[
@@ -45,29 +52,17 @@ export default function NavbarClient({
           : "border-b border-sand-dark bg-sand/90 backdrop-blur",
       ].join(" ")}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+      <div
+        className={[
+          "mx-auto flex max-w-7xl items-center justify-between px-6 transition-[height] duration-300",
+          overHero ? "h-24 md:h-28" : "h-20 md:h-24",
+        ].join(" ")}
+      >
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain
-            <img
-              src={logoUrl}
-              alt={brandName}
-              className={[
-                "h-12 w-auto rounded-full transition-all duration-300",
-                overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : "",
-              ].join(" ")}
-            />
-          ) : (
-            <Image
-              src={logo}
-              alt={brandName}
-              className={[
-                "h-12 w-auto rounded-full transition-all duration-300",
-                overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : "",
-              ].join(" ")}
-              priority
-            />
-          )}
+          {/* Wide pineapple-beside-wordmark lockup, bundled rather than CMS-managed: the
+              stacked logo from the admin panel is too tall for "Oceanfront Rentals" to be
+              legible at navbar height. The footer still uses the CMS logo. */}
+          <Image src={logo} alt={brandName} className={logoClassName} priority />
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">

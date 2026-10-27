@@ -17,7 +17,6 @@ export default async function Navbar() {
   const navbar = sections.navbar ?? {};
 
   const brandName = settings?.siteName ?? "LahainaOceanfrontRentals";
-  const logoUrl = settings?.logoUrl ?? null;
   const ctaLabel =
     typeof navbar.ctaLabel === "string" && navbar.ctaLabel ? navbar.ctaLabel : "Book Now";
 
@@ -30,5 +29,5 @@ export default async function Navbar() {
         : link.defaultLabel,
   }));
 
-  return <NavbarClient brandName={brandName} logoUrl={logoUrl} links={links} ctaLabel={ctaLabel} />;
+  return <NavbarClient brandName={brandName} links={links} ctaLabel={ctaLabel} />;
 }

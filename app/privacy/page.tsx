@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
-import heroImage from "@/public/images/stock/snorkeling-reef.jpg";
+import heroImage from "@/public/images/maui/mahana-pool-overhead.jpg";
 import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = {

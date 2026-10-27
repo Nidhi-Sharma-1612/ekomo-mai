@@ -1,39 +1,40 @@
+import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
-import beachPalms from "@/public/images/stock/beach-palms-sailboat.jpg";
-import reef from "@/public/images/stock/snorkeling-reef.jpg";
-import paddleboard from "@/public/images/stock/paddleboard-sunset.jpg";
-import birdsSunrise from "@/public/images/stock/beach-birds-sunrise.jpg";
+import beachOverhead from "@/public/images/maui/kaanapali-beach-overhead.jpg";
+import coastline from "@/public/images/maui/mahana-coastline-aerial.jpg";
+import catamaranSunset from "@/public/images/maui/sunset-catamaran.jpg";
+import beachPalms from "@/public/images/maui/mahana-beach-palms.jpg";
 import { FishIcon, PaddleboardIcon, SunriseIcon, UmbrellaIcon } from "@/components/ExploreIcons";
-import { getPageSections, str } from "@/lib/cms";
+import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 // Icon and layout offset stay fixed per tile position — only the label and
 // image are CMS-editable, so an admin can't accidentally break the icon
 // lookup by editing a raw "icon name" text field.
 const highlights = [
   {
-    image: beachPalms.src,
-    alt: "Palm-lined beach with a sailboat on the sand",
+    image: beachOverhead.src,
+    alt: "Overhead view of beachgoers on the sand at Kaanapali",
     label: "Days on the Sand",
     icon: UmbrellaIcon,
     offset: "",
   },
   {
-    image: reef.src,
-    alt: "Diver exploring a tropical reef teeming with fish",
+    image: coastline.src,
+    alt: "Turquoise coastline water along the Kaanapali coastline",
     label: "Reef Diving & Snorkeling",
     icon: FishIcon,
     offset: "lg:mt-10",
   },
   {
-    image: paddleboard.src,
-    alt: "Paddleboarder silhouetted against a calm sunset sea",
+    image: catamaranSunset.src,
+    alt: "Catamaran silhouetted against a West Maui sunset",
     label: "Paddleboarding at Sunset",
     icon: PaddleboardIcon,
     offset: "",
   },
   {
-    image: birdsSunrise.src,
-    alt: "Birds flying over the shore at sunrise",
+    image: beachPalms.src,
+    alt: "Palm-lined beach in front of The Mahana",
     label: "Sunrise Beach Walks",
     icon: SunriseIcon,
     offset: "lg:mt-10",
@@ -85,11 +86,13 @@ export default async function ExploreIsland() {
               key={item.label}
               className={`group relative aspect-3/4 overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-xl ${item.offset}`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
-              <img
+              <Image
                 src={item.image}
                 alt={item.alt}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="(min-width: 1024px) 256px, 50vw"
+                unoptimized={!isOptimizableImage(item.image)}
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-ocean-deep/90 via-ocean-deep/20 to-transparent" />
 

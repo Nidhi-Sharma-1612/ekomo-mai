@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Home, Tag } from "lucide-react";
-import bg from "@/public/images/stock/beach-birds-sunrise.jpg";
-import { getPageSections, str } from "@/lib/cms";
+import bg from "@/public/images/maui/sunset-sailboats-beach.jpg";
+import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 const trustSignals = [
   { icon: BadgeCheck, label: "Superhost Rated" },
@@ -24,11 +25,13 @@ export default async function CtaBand() {
 
   return (
     <section className="relative isolate overflow-hidden py-28">
-      {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
-      <img
+      <Image
         src={backgroundImage}
-        alt="Sunrise over a Maui beach with birds flying overhead"
-        className="absolute inset-0 h-full w-full animate-cta-zoom object-cover"
+        alt="Sailboats anchored off a Maui beach at sunset"
+        fill
+        sizes="100vw"
+        unoptimized={!isOptimizableImage(backgroundImage)}
+        className="animate-cta-zoom object-cover"
       />
       <div className="absolute inset-0 bg-ocean-deep/80" />
       <div className="absolute inset-0 bg-linear-to-b from-ocean-deep/50 via-transparent to-ocean-deep/50" />

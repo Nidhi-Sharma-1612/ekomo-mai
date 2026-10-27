@@ -1,7 +1,8 @@
-import heroImageA from "@/public/images/stock/hero-beach-sunset.jpg";
+import { getImageProps } from "next/image";
+import heroImageA from "@/public/images/maui/mahana-aerial-kaanapali.jpg";
 import WaveDivider from "@/components/WaveDivider";
 import BookingWidget from "@/components/BookingWidget";
-import { getPageSections, str } from "@/lib/cms";
+import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 export default async function Hero() {
   const sections = await getPageSections("home");
@@ -16,6 +17,17 @@ export default async function Hero() {
   );
   const heroVideo = str(hero, "heroVideo", "/videos/hero.mp4");
   const heroImage = str(hero, "heroImage", heroImageA.src);
+
+  // One resized, re-encoded copy serves as both the video poster (shown while
+  // the video buffers — the LCP frame) and the reduced-motion fallback.
+  const { props: heroImageProps } = getImageProps({
+    src: heroImage,
+    alt: "Aerial view of The Mahana on Kaanapali Beach, West Maui",
+    width: 1920,
+    height: 1080,
+    quality: 70,
+    unoptimized: !isOptimizableImage(heroImage),
+  });
 
   // Preserves the original gold-accent styling on "Maui's" when that exact
   // word is present, but degrades gracefully to plain text if an editor
@@ -33,15 +45,16 @@ export default async function Hero() {
           muted
           loop
           playsInline
-          poster={heroImage}
+          preload="metadata"
+          poster={heroImageProps.src}
           className="hero-video absolute inset-0 h-full w-full object-cover"
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
-        {/* eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- getImageProps output, already optimized */}
         <img
-          src={heroImage}
-          alt="Golden sunset over a Maui beach"
+          {...heroImageProps}
+          alt={heroImageProps.alt}
           className="hero-video-fallback absolute inset-0 h-full w-full object-cover"
         />
 
