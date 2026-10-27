@@ -91,7 +91,7 @@ export default async function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-sand/50">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-sand/75">
             Explore
           </h3>
           <ul className="mt-4 space-y-3 text-sm">
@@ -110,7 +110,7 @@ export default async function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-sand/50">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-sand/75">
             Get in touch
           </h3>
           <ul className="mt-4 space-y-3 text-sm text-sand/80">
@@ -132,7 +132,7 @@ export default async function Footer() {
                 {phone}
               </a>
             </li>
-            <li className="flex items-center gap-2.5 text-sand/60">
+            <li className="flex items-center gap-2.5 text-sand/75">
               <PinIcon className="shrink-0 text-gold" />
               {address}
             </li>
@@ -141,7 +141,7 @@ export default async function Footer() {
       </div>
 
       <div className="relative border-t border-sand/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-sand/50 sm:flex-row">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-sand/75 sm:flex-row">
           <p>&copy; {new Date().getFullYear()} {copyrightName}. All rights reserved.</p>
 
           <div className="flex items-center gap-2">

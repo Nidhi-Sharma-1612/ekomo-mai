@@ -62,7 +62,13 @@ export default function NavbarClient({
           {/* Wide pineapple-beside-wordmark lockup, bundled rather than CMS-managed: the
               stacked logo from the admin panel is too tall for "Oceanfront Rentals" to be
               legible at navbar height. The footer still uses the CMS logo. */}
-          <Image src={logo} alt={brandName} className={logoClassName} priority />
+          <Image
+            src={logo}
+            alt={brandName}
+            sizes="(min-width: 768px) 230px, 154px"
+            className={logoClassName}
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">

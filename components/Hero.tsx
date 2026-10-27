@@ -2,6 +2,7 @@ import { getImageProps } from "next/image";
 import heroImageA from "@/public/images/maui/mahana-aerial-kaanapali.jpg";
 import WaveDivider from "@/components/WaveDivider";
 import BookingWidget from "@/components/BookingWidget";
+import HeroVideo from "@/components/HeroVideo";
 import { getPageSections, isOptimizableImage, str } from "@/lib/cms";
 
 export default async function Hero() {
@@ -18,14 +19,17 @@ export default async function Hero() {
   const heroVideo = str(hero, "heroVideo", "/videos/hero.mp4");
   const heroImage = str(hero, "heroImage", heroImageA.src);
 
-  // One resized, re-encoded copy serves as both the video poster (shown while
-  // the video buffers — the LCP frame) and the reduced-motion fallback.
+  // The hero photo is the always-visible base layer (and the LCP element):
+  // phones only ever see it, and on larger screens the video fades in over it
+  // once loaded. `sizes` lets phones fetch a phone-sized copy.
   const { props: heroImageProps } = getImageProps({
     src: heroImage,
     alt: "Aerial view of The Mahana on Kaanapali Beach, West Maui",
     width: 1920,
     height: 1080,
+    sizes: "100vw",
     quality: 70,
+    priority: true,
     unoptimized: !isOptimizableImage(heroImage),
   });
 
@@ -40,23 +44,13 @@ export default async function Hero() {
   return (
     <section className="relative min-h-[110dvh]">
       <div className="absolute inset-0 overflow-hidden bg-ocean-deep">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster={heroImageProps.src}
-          className="hero-video absolute inset-0 h-full w-full object-cover"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
         {/* eslint-disable-next-line @next/next/no-img-element -- getImageProps output, already optimized */}
         <img
           {...heroImageProps}
           alt={heroImageProps.alt}
-          className="hero-video-fallback absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
+        <HeroVideo src={heroVideo} />
 
         {/* Contrast scrim so the headline and widget stay readable over any frame — kept light enough that the video's real color still shows through */}
         <div className="absolute inset-0 bg-linear-to-t from-ocean-deep/60 via-ocean-deep/30 to-ocean-deep/25" />
